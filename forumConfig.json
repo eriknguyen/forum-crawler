@@ -1,0 +1,139 @@
+{
+	"_id": "hardwarezone",
+	"url": "http://forums.hardwarezone.com.sg",
+	"collectionName": "hardwarezone",
+	"boardSelector": "tbody[id~=^collapseobj_forumbit_[0-9]+] a[href~=^/([a-z0-9]|-)+[0-9]+/$]",
+	"thread": {
+		"threadSelector": "tbody[id~=^threadbits_forum_[0-9]+$]>tr",
+		"threadTitle": "a[id~=^thread_title_[0-9]+$]",
+		"lastPostTime": "td:nth-child(4) > div",
+		"lastPostUser": "td:nth-child(4) > div:first-child > a",
+		"stickyClass": "hwz-sticky",
+		"threadCreator": "td:nth-child(3) > div:last-child>span",
+		"replies": "td:nth-child(5)",
+		"views": "td:nth-child(6)"
+	},
+	"post": {
+		"postSelector": "table[id~=^post[0-9]+$]",
+		"postTime": "tr:first-child>td.thead:first-child",
+		"postBody": "tr",
+		"postContent": "div[id~=^post_message_[0-9]+$]",
+		"postUser": "div[id~=^postmenu_[0-9]+$]",
+		"postQuote": "div[id~=^post_message_[0-9]+$]>div.quote"
+	},	
+	"nextButtonSelector": ".pagination li.prevnext a:contains(Next)",
+	"useTimeAttribute": false,
+	"timeAttributeName": ""
+}
+
+{
+	"_id": "renotalk",
+	"url": "http://www.renotalk.com/forum/",
+	"collectionName": "renotalk",
+	"boardSelector": "li.cForumRow.ipsBox div.ipsDataItem_main>h4.ipsDataItem_title>a, li.cForumRow.ipsBox div.ipsDataItem_main>ul.ipsDataItem_subList>li>a",
+	"thread": {
+		"threadSelector": "ol.cTopicList>li.ipsDataItem",
+		"threadTitle": "div.ipsDataItem_main>h4.ipsDataItem_title>a",
+		"lastPostTime": "ul.ipsDataItem_lastPoster>li time",
+		"lastPostUser": "ul.ipsDataItem_lastPoster>li:nth-child(2)",
+		"stickyClass": "",
+		"threadCreator": "div.ipsDataItem_main>div.ipsDataItem_meta span[itemprop=\"name\"]",
+		"replies": "ul.ipsDataItem_stats>li:first-child>span.ipsDataItem_stats_number",
+		"views": "ul.ipsDataItem_stats>li.ipsType_light>span.ipsDataItem_stats_number"
+	},
+	"post": {
+		"postSelector": "article.cPost.ipsComment",
+		"postTime": "div.ipsComment_content>div.ipsComment_meta time",
+		"postBody": "div.cPost_contentWrap",
+		"postContent": "div.cPost_contentWrap>div.ipsType_normal",
+		"postUser": ">aside.ipsComment_author>h3.cAuthorPane_author strong",
+		"postQuote": "div.cPost_contentWrap>div.ipsType_normal"
+	},	
+	"nextButtonSelector": "ul.ipsPagination>li.ipsPagination_next:not(.ipsPagination_inactive)>a",
+	"useTimeAttribute": true,
+	"timeAttributeName": "datetime"
+}
+
+{
+	"_id": "clubsnap",
+	"url": "http://www.clubsnap.com/forums",
+	"collectionName": "clubsnap",
+	"boardSelector": "li.forumbit_post h2.forumtitle>a, li.forumbit_post li.subforum>a",
+	"thread": {
+		"threadSelector": "",
+		"threadTitle": "",
+		"lastPostTime": "",
+		"lastPostUser": "",
+		"stickyClass": "",
+		"threadCreator": "",
+		"replies": "",
+		"views": ""
+	},
+	"post": {
+		"postSelector": "",
+		"postTime": "",
+		"postBody": "",
+		"postContent": "",
+		"postUser": "",
+		"postQuote": ""
+	},	
+	"nextButtonSelector": "",
+	"useTimeAttribute": false,
+	"timeAttributeName": ""
+}
+
+{
+	"_id": "sample_format",
+	"url": "",
+	"collectionName": "",
+	"boardSelector": "",
+	"thread": {
+		"threadSelector": "",
+		"threadTitle": "",
+		"lastPostTime": "",
+		"lastPostUser": "",
+		"stickyClass": "",
+		"threadCreator": "",
+		"replies": "",
+		"views": ""
+	},
+	"post": {
+		"postSelector": "",
+		"postTime": "",
+		"postBody": "",
+		"postContent": "",
+		"postUser": "",
+		"postQuote": ""
+	},	
+	"nextButtonSelector": "",
+	"useTimeAttribute": false,
+	"timeAttributeName": ""
+}
+
+{
+	"_id": "kiasuparents",
+	"url": "http://www.kiasuparents.com/kiasu/forum",
+	"collectionName": "kiasuparents",
+	"boardSelector": "ul.topiclist.forums>li a.forumtitle, ul.topiclist.forums>li a.subforum",
+	"thread": {
+		"threadSelector": "ul.topiclít.topics>li",
+		"threadTitle": "a.topictitle",
+		"lastPostTime": "",
+		"lastPostUser": "",
+		"stickyClass": "",
+		"threadCreator": "",
+		"replies": "",
+		"views": ""
+	},
+	"post": {
+		"postSelector": "",
+		"postTime": "",
+		"postBody": "",
+		"postContent": "",
+		"postUser": "",
+		"postQuote": ""
+	},	
+	"nextButtonSelector": "",
+	"useTimeAttribute": false,
+	"timeAttributeName": ""
+}
