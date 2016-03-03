@@ -129,7 +129,7 @@ public class MainCrawler {
 					String url = board;
 					String prefix = "testPrefix_";
 					int maxLevel = 1;
-					int maxThreads = 1;
+					int maxThreads = 16;
 
 					TaskQueue queue = new TaskQueue();
 					queue.setFilenamePrefix(prefix);
