@@ -21,6 +21,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
@@ -56,6 +57,8 @@ public class MainCrawler {
 
 	public void finishedAll() {
 		// ignore
+		System.out.println("Finished at: " + ZonedDateTime.now());
+
 	}
 
 	public void receiveMessage(CrawlTask task, int threadId) {
@@ -69,6 +72,7 @@ public class MainCrawler {
 
 	public static void main(String[] args) {
 
+		System.out.println(ZonedDateTime.now());
 		MongoClient mongoClient = new MongoClient("localhost", 27017);
 		MongoDatabase db = mongoClient.getDatabase("test");
 
@@ -102,14 +106,14 @@ public class MainCrawler {
 			boardList.add(doc.getString("_id"));
 		}
 
-		/*String board = boardList.get(5);
+		/*String board = boardList.get(3);
 		System.out.println(board);
 
 		try {
 			String url = board;
 			String prefix = "testPrefix_";
 			int maxLevel = 1;
-			int maxThreads = 8;
+			int maxThreads = 16;
 
 			TaskQueue queue = new TaskQueue();
 			queue.setFilenamePrefix(prefix);
@@ -122,6 +126,7 @@ public class MainCrawler {
 			System.err.println("An error occured: ");
 			e.printStackTrace();
 		}*/
+
 
 		for (String board : boardList) {
 			if (boardList.indexOf(board)!=5) {
