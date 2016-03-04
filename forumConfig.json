@@ -35,7 +35,7 @@
 	"boardSelector": "li.cForumRow.ipsBox div.ipsDataItem_main>h4.ipsDataItem_title>a, li.cForumRow.ipsBox div.ipsDataItem_main>ul.ipsDataItem_subList>li>a",
 	"thread": {
 		"threadSelector": "ol.cTopicList>li.ipsDataItem",
-		"threadTitle": "div.ipsDataItem_main>h4.ipsDataItem_title>a",
+		"threadTitle": "div.ipsDataItem_main>h4.ipsDataItem_title>a:not(.ipsTag_prefix)",
 		"lastPostTime": "ul.ipsDataItem_lastPoster>li time",
 		"lastPostUser": "ul.ipsDataItem_lastPoster>li:nth-child(2)",
 		"stickyClass": "div.ipsDataItem_main>h4.ipsDataItem_title span[title=\"Pinned\"]",

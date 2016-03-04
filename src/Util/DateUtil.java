@@ -18,6 +18,12 @@ public class DateUtil {
         return date;
     }
 
+    public static Date parseSimpleDate(String dateStr) throws ParseException {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
+        Date date = formatter.parse(dateStr);
+        return date;
+    }
+
     public static String formatDate(Date lastPostTime) {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
         return formatter.format(lastPostTime);

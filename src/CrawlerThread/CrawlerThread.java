@@ -6,12 +6,14 @@ import Entities.ForumPost;
 import Entities.ForumThread;
 import Util.DateUtil;
 import Util.HtmlHelper;
+import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClients;
+import org.bson.Document;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -141,11 +143,18 @@ public class CrawlerThread extends Thread{
 						lastPostTimeStr = threadItem.select(forum.getThreadLastPostTime()).first().text().replaceAll("\\s", "");
 					}
 					Date lastPostTime = DateUtil.parseDate(lastPostTimeStr, forum.getDateFormat());
-
-
-
 					thread.setLastPostTime(DateUtil.formatDate(lastPostTime));
 					thread.setSticky(threadItem.select(forum.getStickyClass()).size()>0);
+
+					Document checkThreadId = (Document) collection.find(new Document("_id", thread.getThreadUrl())).first();
+					if (checkThreadId != null) {
+						Date dateFromDB = DateUtil.parseSimpleDate(checkThreadId.getString("threadLastPostTime"));
+						boolean hasUpdate = dateFromDB.before(lastPostTime);
+						if ( (!thread.isSticky()) && (!hasUpdate) ) {
+							System.out.println("NO MORE UPDATE FROM THREAD: " + thread.getThreadName());
+							return;
+						}
+					}
 					thread.setThreadCreator(threadItem.select(forum.getThreadCreator()).first().text());
 					String replies = threadItem.select(forum.getThreadReplies()).first().text().replaceAll(",","");
 					String views = threadItem.select(forum.getThreadViews()).first().text().replaceAll(",","");
@@ -156,7 +165,7 @@ public class CrawlerThread extends Thread{
 					thread.setLastPostUser(lastPostUser);
 
                 	/*Add thread to database*/
-					addThreadToDB(thread, collection);
+					thread.addThreadToDB(collection);
 					//System.out.println("Thread " + (threadList.indexOf(threadItem)+1) + ": " + thread.getThreadName() + " added to DB");
 					//thread.printThread();
 					list.add(thread);
@@ -175,24 +184,6 @@ public class CrawlerThread extends Thread{
 			} else {
 				//System.out.println("This is the last page!");
 			}
-		}
-	}
-
-
-	private static void addThreadToDB(ForumThread thread, MongoCollection<org.bson.Document> collection) {
-		String threadUrl = thread.getThreadUrl();
-		org.bson.Document doc = collection.find(new org.bson.Document("_id", threadUrl)).first();
-		if (doc==null) {
-			collection.insertOne(
-					thread.extractThreadBson()
-			);
-			//System.out.println("Thread added.");
-		} else {
-			collection.replaceOne(
-					new org.bson.Document("_id", threadUrl),
-					thread.extractThreadBson()
-			);
-			//System.out.println("Thread updated.");
 		}
 	}
 

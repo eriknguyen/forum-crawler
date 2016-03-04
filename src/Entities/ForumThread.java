@@ -1,5 +1,6 @@
 package Entities;
 
+import com.mongodb.client.MongoCollection;
 import org.bson.Document;
 
 /**
@@ -120,5 +121,22 @@ public class ForumThread {
                 .append("threadLastPostUser", this.lastPostUser)
                 .append("threadReplies", this.replies)
                 .append("threadViews", this.views);
+    }
+
+    public void addThreadToDB(MongoCollection<Document> collection) {
+        String threadUrl = this.threadUrl;
+        org.bson.Document doc = collection.find(new org.bson.Document("_id", threadUrl)).first();
+        if (doc==null) {
+            collection.insertOne(
+                    this.extractThreadBson()
+            );
+            //System.out.println("Thread added.");
+        } else {
+            collection.replaceOne(
+                    new org.bson.Document("_id", threadUrl),
+                    this.extractThreadBson()
+            );
+            //System.out.println("Thread updated.");
+        }
     }
 }
