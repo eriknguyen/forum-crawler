@@ -14,6 +14,7 @@ public class ForumConfig {
     private String nextButton;
     private boolean useTimeAttribute;
     private String timeAttributeName;
+    private boolean postNewToOld;
 
     private String threadSelector;
     private String threadTitle;
@@ -39,6 +40,7 @@ public class ForumConfig {
         this.nextButton = configDoc.getString("nextButtonSelector");
         this.useTimeAttribute = configDoc.getBoolean("useTimeAttribute");
         this.timeAttributeName = configDoc.getString("timeAttributeName");
+        this.postNewToOld = configDoc.getBoolean("postNewToOld");
 
         Document threadSelectorGroup = ((Document) configDoc.get("thread"));
         this.threadSelector = threadSelectorGroup.getString("threadSelector");
@@ -226,6 +228,14 @@ public class ForumConfig {
 
     public void setTimeAttributeName(String timeAttributeName) {
         this.timeAttributeName = timeAttributeName;
+    }
+
+    public boolean isPostNewToOld() {
+        return postNewToOld;
+    }
+
+    public void setPostNewToOld(boolean postNewToOld) {
+        this.postNewToOld = postNewToOld;
     }
 
     public void printForumConfig() {

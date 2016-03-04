@@ -1,32 +1,19 @@
 package CrawlerThread;
 
 /**
- * A simple controller class for a multithreaded environment, where threads
- * may insert and process 'tasks' from/into a queue. Multiple 'depth-levels'
- * are supported. 'Tasks' are not to be confused with OS tasks, but just
- * denote elements in the queue, i.e. a task for the thread to perform.
  *
- * Note that the depth level in this class is just to make sure that where
- * appropriate a thread may only read tasks from level n and write tasks to
- * level n+1, i.e. only two levels at a time are supported. The actual number
- * is in this class only used as a halting criteria, but a thread may use
- * the information.
+ * This code uses reference by Andreas Hess <andreas.hess@ucd.ie> in the public domain.
+ * Link: http://andreas-hess.info/programming/webcrawler/
  *
- * For more information on what the depth-levels are good for see the comments
- * for interface Queue.
- *
- * This code is in the public domain.
- *
- * @author Andreas Hess <andreas.hess@ucd.ie>, 01/02/2003
  * 
  */
 
 public class ThreadController {
 
-	/**
-	 * current level (see interface Queue for details on levels)
-	 */
-	int level;
+	int currentLevel;
+	TaskQueue tasks;
+	MainCrawler receiver;
+	int threadId;
 
 	/**
 	 * maximum depth level allowed
@@ -41,33 +28,14 @@ public class ThreadController {
 	int maxThreads;
 
 	/**
-	 * the task queue
-	 */
-	TaskQueue tasks;
-
-	/**
-	 * An object that is notified about what a thread does
-	 * See comments for interface MessageReceiver for details.
-	 */
-	MainCrawler receiver;
-
-	/**
 	 * The class of the threads created by this ThreadController
-	 * This class is expected to be a subtype of ControllableThread.
 	 */
 	Class threadClass;
 
 	/**
 	 * A unique synchronized counter
 	 */
-	int counter;
-
-	/**
-	 * Number of currently running threads
-	 * This value is handed to the threads as an id, so note that the thread
-	 * id is not unique, but is always in the range 0...maxThreads-1
-	 */
-	int nThreads;
+	int syncCounter;
 
 	/**
 	 * Constructor that intializes the instance variables
@@ -90,10 +58,10 @@ public class ThreadController {
 		maxThreads = _maxThreads;
 		maxLevel = _maxLevel;
 		tasks = _tasks;
-		level = _level;
+		currentLevel = _level;
 		receiver = _receiver;
-		counter = 0;
-		nThreads = 0;
+		syncCounter = 0;
+		threadId = 0;
 		startThreads();
 	}
 
@@ -101,7 +69,7 @@ public class ThreadController {
 	 * Get a unique number from a counter
 	 */
 	public synchronized int getUniqueNumber() {
-		return counter++;
+		return syncCounter++;
 	}
 
 	/**
@@ -131,7 +99,7 @@ public class ThreadController {
 	 * Get number of currently running threads
 	 */
 	public int getRunningThreads() {
-		return nThreads;
+		return threadId;
 	}
 
 	/**
@@ -142,34 +110,36 @@ public class ThreadController {
 	 * allowed) and start new threads.
 	 */
 	public synchronized void finished(int threadId) {
-		nThreads--;
+		this.threadId--;
 		receiver.finished(threadId);
-		if (nThreads == 0) {
-			level++;
-			if (level > maxLevel) {
+		if (this.threadId == 0) {
+			currentLevel++;
+			if (currentLevel > maxLevel) {
 				receiver.finishedAll();
 				return;
 			}
 			// debug
 			// System.err.println("new level " + level);
 			// if no tasks in queue we're don
-			if (tasks.getQueueSize(level) == 0) {
+			if (tasks.getQueueSize(currentLevel) == 0) {
 				receiver.finishedAll();
 				return;
 			}
 			try {
-				System.out.println("GOING TO NEXT LEVEL: " + level);
+				System.out.println("GOING TO NEXT LEVEL: " + currentLevel);
 				startThreads();
 			} catch (InstantiationException e) {
 				// Something has gone wrong on the way, because if it hadn't
 				// worked at all we wouldn't be here. Anyway, we can do
 				// nothing about it, so we just quit instead of moving to
 				// a new level.
+				e.printStackTrace();
 			} catch (IllegalAccessException e) {
 				// Something has gone wrong on the way, because if it hadn't
 				// worked at all we wouldn't be here. Anyway, we can do
 				// nothing about it, so we just quit instead of moving to
 				// a new level.
+				e.printStackTrace();
 			}
 		}
 	}
@@ -177,27 +147,26 @@ public class ThreadController {
 	/**
 	 * Start the maximum number of allowed threads
 	 */
-	public synchronized void startThreads()
-		throws InstantiationException, IllegalAccessException {
+	public synchronized void startThreads() throws InstantiationException, IllegalAccessException {
 		// Start m threads
 		// For more information on where m comes from see comment on
 		// the constructor.
-		int m = maxThreads - nThreads;
-		int ts = tasks.getQueueSize(level);
+		int m = maxThreads - threadId;
+		int ts = tasks.getQueueSize(currentLevel);
 		if (ts < m || maxThreads == -1) {
 			m = ts;
 		}
 		// debug
-		// System.err.println(m + " " + maxThreads + " " + nThreads + " " + ts);
+		// System.err.println(m + " " + maxThreads + " " + threadId + " " + ts);
 		// Create some threads
 		for (int n = 0; n < m; n++) {
 			CrawlerThread thread =
 				(CrawlerThread) threadClass.newInstance();
 			thread.setThreadController(this);
 			thread.setMessageReceiver(receiver);
-			thread.setLevel(level);
+			thread.setLevel(currentLevel);
 			thread.setQueue(tasks);
-			thread.setId(nThreads++);
+			thread.setId(threadId++);
 			thread.start();
 		}
 	}

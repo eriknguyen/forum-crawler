@@ -51,7 +51,8 @@
 	},	
 	"nextButtonSelector": "ul.ipsPagination>li.ipsPagination_next:not(.ipsPagination_inactive)>a",
 	"useTimeAttribute": true,
-	"timeAttributeName": "datetime"
+	"timeAttributeName": "datetime",
+	"postNewToOld": true
 }
 
 {

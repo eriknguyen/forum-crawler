@@ -49,9 +49,9 @@ public class CrawlerThread extends Thread{
 	public void run() {
 		// pop new urls from the queue until queue is empty
 		for (CrawlTask newTask = queue.pop(level); newTask != null; newTask = queue.pop(level))
-		/*while (queue.getQueueSize(level)>0)*/
+		/*while (queue.getQueueSize(currentLevel)>0)*/
 		{
-//			Object newTask = queue.pop(level);
+//			Object newTask = queue.pop(currentLevel);
 			// Tell the message receiver what we're doing now
 			mr.receiveMessage(newTask, id);
 			// Process the newTask
