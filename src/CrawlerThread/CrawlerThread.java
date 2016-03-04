@@ -4,6 +4,7 @@ import Entities.CrawlTask;
 import Entities.ForumConfig;
 import Entities.ForumPost;
 import Entities.ForumThread;
+import Util.DateUtil;
 import Util.HtmlHelper;
 import com.mongodb.client.MongoCollection;
 import org.apache.http.HttpEntity;
@@ -20,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.*;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class CrawlerThread extends Thread{
@@ -132,29 +134,34 @@ public class CrawlerThread extends Thread{
 				thread.setThreadUrl(threadTitle.absUrl("href"));
 				thread.setThreadName(threadTitle.text().replaceAll("\'",""));
 				try {
-					thread.setSticky(threadItem.hasClass(forum.getStickyClass()));
-					thread.setThreadCreator(threadItem.select(forum.getThreadCreator()).first().text());
+					String lastPostTimeStr;
+					if (forum.isUsingTimeAttribute()) {
+						lastPostTimeStr = threadItem.select(forum.getThreadLastPostTime()).first().attr(forum.getTimeAttributeName());
+					} else {
+						lastPostTimeStr = threadItem.select(forum.getThreadLastPostTime()).first().text().replaceAll("\\s", "");
+					}
+					Date lastPostTime = DateUtil.parseDate(lastPostTimeStr, forum.getDateFormat());
 
+
+
+					thread.setLastPostTime(DateUtil.formatDate(lastPostTime));
+					thread.setSticky(threadItem.select(forum.getStickyClass()).size()>0);
+					thread.setThreadCreator(threadItem.select(forum.getThreadCreator()).first().text());
 					String replies = threadItem.select(forum.getThreadReplies()).first().text().replaceAll(",","");
 					String views = threadItem.select(forum.getThreadViews()).first().text().replaceAll(",","");
 					thread.setReplies(Integer.parseInt(replies));
 					thread.setViews(Integer.parseInt(views));
-					String lastPostTime;
-					if (forum.isUsingTimeAttribute()) {
-						lastPostTime = threadItem.select(forum.getThreadLastPostTime()).first().attr(forum.getTimeAttributeName());
-					} else {
-						lastPostTime = threadItem.select(forum.getThreadLastPostTime()).first().text().replaceAll("\\s", "");
-					}
-					thread.setLastPostTime(lastPostTime);
+
 					String lastPostUser = threadItem.select(forum.getThreadLastPostUser()).first().text();
 					thread.setLastPostUser(lastPostUser);
 
-                /*Add thread to database*/
+                	/*Add thread to database*/
 					addThreadToDB(thread, collection);
 					//System.out.println("Thread " + (threadList.indexOf(threadItem)+1) + ": " + thread.getThreadName() + " added to DB");
 					//thread.printThread();
 					list.add(thread);
 				} catch (Exception e) {
+					e.printStackTrace();
 					System.out.println("Thread is moved to other board" /*+ thread.getThreadUrl()*/);
 				}
 

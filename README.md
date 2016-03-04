@@ -1,3 +1,3 @@
 # fyp-crawler
 
-*This is my forum crawler for my fyp*
+*This is the forum crawler for my fyp*

@@ -21,8 +21,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -70,11 +73,11 @@ public class MainCrawler {
 		System.out.println("[" + threadId + "] finished");
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws ParseException {
 
 		System.out.println(ZonedDateTime.now());
 		MongoClient mongoClient = new MongoClient("localhost", 27017);
-		MongoDatabase db = mongoClient.getDatabase("test");
+		MongoDatabase db = mongoClient.getDatabase("myDB");
 
 		/*Get the forum configuration from DB, forumConfig collection*/
 		Hashtable<String, ForumConfig> forumTable = new Hashtable<>();
@@ -93,6 +96,10 @@ public class MainCrawler {
 
 		ForumConfig forumConfig = forumTable.get(ID_RENOTALK);
 
+		Document testDoc = db.getCollection(forumConfig.getCollectionName()).find(
+				new Document("threadName", new Document("$exists", true))
+		).first();
+
 		/*
         * Check if there is any new board. No need to run very often
         *
@@ -106,7 +113,7 @@ public class MainCrawler {
 			boardList.add(doc.getString("_id"));
 		}
 
-		/*String board = boardList.get(3);
+		String board = boardList.get(0);
 		System.out.println(board);
 
 		try {
@@ -125,10 +132,10 @@ public class MainCrawler {
 		} catch (Exception e) {
 			System.err.println("An error occured: ");
 			e.printStackTrace();
-		}*/
+		}
 
 
-		for (String board : boardList) {
+		/*for (String board : boardList) {
 			if (boardList.indexOf(board)!=5) {
 				try {
 					String url = board;
@@ -148,7 +155,7 @@ public class MainCrawler {
 					e.printStackTrace();
 				}
 			}
-		}
+		}*/
 	}
 
 

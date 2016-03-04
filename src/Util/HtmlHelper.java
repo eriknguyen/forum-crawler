@@ -34,7 +34,7 @@ public class HtmlHelper {
             }
 
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println(e);
         }
         return htmlStr;
     }

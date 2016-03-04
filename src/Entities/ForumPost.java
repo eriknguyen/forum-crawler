@@ -7,6 +7,7 @@ import org.bson.Document;
  */
 public class ForumPost {
     private ForumThread thread;
+    private String threadUrl;
     private String postId;
     private String postUrl;
     private String userName;
@@ -74,6 +75,14 @@ public class ForumPost {
 
     public void setHasQuote(boolean hasQuote) {
         this.hasQuote = hasQuote;
+    }
+
+    public String getThreadUrl() {
+        return threadUrl;
+    }
+
+    public void setThreadUrl(String threadUrl) {
+        this.threadUrl = threadUrl;
     }
 
     public void printPost() {
