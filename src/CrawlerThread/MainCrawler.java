@@ -96,10 +96,6 @@ public class MainCrawler {
 
 		ForumConfig forumConfig = forumTable.get(ID_RENOTALK);
 
-		Document testDoc = db.getCollection(forumConfig.getCollectionName()).find(
-				new Document("threadName", new Document("$exists", true))
-		).first();
-
 		/*
         * Check if there is any new board. No need to run very often
         *
