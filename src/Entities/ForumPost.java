@@ -6,7 +6,6 @@ import org.bson.Document;
  * Created by Khanh Nguyen on 1/13/2016.
  */
 public class ForumPost {
-    private ForumThread thread;
     private String threadUrl;
     private String postId;
     private String postUrl;
@@ -17,24 +16,12 @@ public class ForumPost {
 
     public ForumPost() {}
 
-    public ForumPost(ForumThread thread) {
-        this.thread = thread;
-    }
-
     public String getPostId() {
         return postId;
     }
 
     public void setPostId(String postId) {
         this.postId = postId;
-    }
-
-    public ForumThread getThread() {
-        return thread;
-    }
-
-    public void setThread(ForumThread thread) {
-        this.thread = thread;
     }
 
     public String getPostUrl() {
@@ -95,6 +82,7 @@ public class ForumPost {
 
     public Document extractPostBson() {
         return new Document("_id", this.postId)
+                .append("threadUrl", this.threadUrl)
                 .append("postTime", this.postTime)
                 .append("postUrl", this.postUrl)
                 .append("postUser", this.userName)

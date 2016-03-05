@@ -8,6 +8,7 @@ import org.bson.Document;
  */
 public class ForumThread {
 
+    private String boardUrl;
     private String threadUrl;
     private boolean isSticky;
     private String threadName;
@@ -18,11 +19,19 @@ public class ForumThread {
     private int views;
     private boolean isUpdated;
 
-    public ForumThread() {    }
+    public ForumThread() {}
 
     public ForumThread(String threadUrl) {
         this.threadUrl = threadUrl;
         this.isUpdated = false;
+    }
+
+    public String getBoardUrl() {
+        return boardUrl;
+    }
+
+    public void setBoardUrl(String boardUrl) {
+        this.boardUrl = boardUrl;
     }
 
     public String getThreadUrl() {

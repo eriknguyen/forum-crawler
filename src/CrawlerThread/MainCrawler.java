@@ -109,20 +109,20 @@ public class MainCrawler {
 			boardList.add(doc.getString("_id"));
 		}
 
-		String board = boardList.get(0);
-		System.out.println(board);
+		String prefix = "testPrefix_";
+		int maxLevel = 1;
+		int maxThreads = 16;
 
 		try {
-			String url = board;
-			String prefix = "testPrefix_";
-			int maxLevel = 1;
-			int maxThreads = 16;
-
 			TaskQueue queue = new TaskQueue();
 			queue.setFilenamePrefix(prefix);
-			CrawlTask task = new CrawlTask(url, collection, forumConfig);
-			queue.push(task, 0);
-
+			for (int i = 0; i < 5; i++) {
+				String url = boardList.get(i);
+				CrawlTask task = new CrawlTask(url, collection, forumConfig);
+				queue.push(task, 0);
+				System.out.println(queue.getQueueSize(0));
+				System.out.println(queue.getQueueSize(1));
+			}
 			new MainCrawler(queue, maxLevel, maxThreads);
 			//return;
 		} catch (Exception e) {

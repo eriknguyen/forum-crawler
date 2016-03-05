@@ -131,6 +131,7 @@ public class CrawlerThread extends Thread{
 			for (Element threadItem : threadList) {
 
 				ForumThread thread = new ForumThread();
+				//thread.setBoardUrl(htmlStr);
 				Element threadTitle = threadItem.select(forum.getThreadTitle()).first();
 
 				thread.setThreadUrl(threadTitle.absUrl("href"));
