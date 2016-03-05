@@ -3,6 +3,7 @@ package CrawlerThread;
 import Entities.CrawlTask;
 import Entities.ForumConfig;
 import Util.HtmlHelper;
+import Util.StringUtil;
 import com.mongodb.MongoClient;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
@@ -96,11 +97,18 @@ public class MainCrawler {
 
 		ForumConfig forumConfig = forumTable.get(ID_RENOTALK);
 
+
+		String a = "http://forums.hardwarezone.com.sg/hardware-clinic-2/%5Bgaming%5D-star-citizen-squadron-42-edge-foundation-asia-fleet-3979535.html";
+		String prefix = "-";
+		String suffix = ".html";
+		String res = StringUtil.extractIndex(a, prefix, suffix);
+		System.out.println(res);
+
 		/*
         * Check if there is any new board. No need to run very often
         *
         * */
-		MongoCollection collection = db.getCollection(forumConfig.getCollectionName());
+		/*MongoCollection collection = db.getCollection(forumConfig.getCollectionName());
 		checkBoardUpdate(forumConfig, collection);
 
 		List<String> boardList = new ArrayList<>();
@@ -129,7 +137,7 @@ public class MainCrawler {
 		} catch (Exception e) {
 			System.err.println("An error occured: ");
 			e.printStackTrace();
-		}
+		}*/
 	}
 
 

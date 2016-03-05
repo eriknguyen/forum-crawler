@@ -62,7 +62,7 @@
 	"lastButtonSelector": "ul.ipsPagination>li.ipsPagination_last>a",
 	"threadPageUrlPrefix": "?page=",
 	"threadPageUrlSuffix": "",
-	"boardPageUrlPrefix": "",
+	"boardPageUrlPrefix": "?page=",
 	"boardPageUrlSuffix": "",
 	"useTimeAttribute": true,
 	"timeAttributeName": "datetime",
