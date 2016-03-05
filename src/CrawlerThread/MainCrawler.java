@@ -116,42 +116,20 @@ public class MainCrawler {
 		try {
 			TaskQueue queue = new TaskQueue();
 			queue.setFilenamePrefix(prefix);
+
 			for (int i = 0; i < 5; i++) {
 				String url = boardList.get(i);
 				CrawlTask task = new CrawlTask(url, collection, forumConfig);
 				queue.push(task, 0);
-				System.out.println(queue.getQueueSize(0));
-				System.out.println(queue.getQueueSize(1));
 			}
+
 			new MainCrawler(queue, maxLevel, maxThreads);
 			//return;
+
 		} catch (Exception e) {
 			System.err.println("An error occured: ");
 			e.printStackTrace();
 		}
-
-
-		/*for (String board : boardList) {
-			if (boardList.indexOf(board)!=5) {
-				try {
-					String url = board;
-					String prefix = "testPrefix_";
-					int maxLevel = 1;
-					int maxThreads = 16;
-
-					TaskQueue queue = new TaskQueue();
-					queue.setFilenamePrefix(prefix);
-					CrawlTask task = new CrawlTask(url, collection, forumConfig);
-					queue.push(task, 0);
-
-					new MainCrawler(queue, maxLevel, maxThreads);
-					//return;
-				} catch (Exception e) {
-					System.err.println("An error occured: ");
-					e.printStackTrace();
-				}
-			}
-		}*/
 	}
 
 

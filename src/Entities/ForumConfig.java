@@ -16,6 +16,10 @@ public class ForumConfig {
     private String timeAttributeName;
     private boolean postOldToNew;
     private String dateFormat;
+    private boolean hasNext;
+    private String lastButton;
+    private String pageUrlPrefix;
+    private String pageUrlSuffix;
 
     private String threadSelector;
     private String threadTitle;
@@ -43,6 +47,10 @@ public class ForumConfig {
         this.timeAttributeName = configDoc.getString("timeAttributeName");
         this.postOldToNew = configDoc.getBoolean("postOldToNew");
         this.dateFormat = configDoc.getString("dateFormat");
+        this.hasNext = configDoc.getBoolean("hasNext");
+        this.lastButton = configDoc.getString("lastButtonSelector");
+        this.pageUrlPrefix = configDoc.getString("pageUrlPrefix");
+        this.pageUrlSuffix = configDoc.getString("pageUrlSuffix");
 
         Document threadSelectorGroup = ((Document) configDoc.get("thread"));
         this.threadSelector = threadSelectorGroup.getString("threadSelector");
@@ -246,6 +254,38 @@ public class ForumConfig {
 
     public void setPostOldToNew(boolean postOldToNew) {
         this.postOldToNew = postOldToNew;
+    }
+
+    public boolean isHasNext() {
+        return hasNext;
+    }
+
+    public void setHasNext(boolean hasNext) {
+        this.hasNext = hasNext;
+    }
+
+    public String getLastButton() {
+        return lastButton;
+    }
+
+    public void setLastButton(String lastButton) {
+        this.lastButton = lastButton;
+    }
+
+    public String getPageUrlPrefix() {
+        return pageUrlPrefix;
+    }
+
+    public void setPageUrlPrefix(String pageUrlPrefix) {
+        this.pageUrlPrefix = pageUrlPrefix;
+    }
+
+    public String getPageUrlSuffix() {
+        return pageUrlSuffix;
+    }
+
+    public void setPageUrlSuffix(String pageUrlSuffix) {
+        this.pageUrlSuffix = pageUrlSuffix;
     }
 
     public void printForumConfig() {
