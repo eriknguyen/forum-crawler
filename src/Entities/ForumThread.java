@@ -123,6 +123,7 @@ public class ForumThread {
     public Document extractThreadBson() {
         return new Document("_id", this.threadUrl)
                 .append("threadName", this.threadName)
+                .append("boardUrl", this.boardUrl)
                 .append("threadCreator", this.threadCreator)
                 .append("isThreadSticky", this.isSticky)
                 .append("isThreadUpdated", this.isUpdated)

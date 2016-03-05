@@ -13,6 +13,7 @@ public class ForumPost {
     private String postContent;
     private String postTime;
     private boolean hasQuote;
+    private boolean isUpdated;
 
     public ForumPost() {}
 
@@ -72,6 +73,14 @@ public class ForumPost {
         this.threadUrl = threadUrl;
     }
 
+    public boolean isUpdated() {
+        return isUpdated;
+    }
+
+    public void setUpdated(boolean updated) {
+        isUpdated = updated;
+    }
+
     public void printPost() {
         System.out.println("POST " + this.postId + ": ");
         System.out.println("Posted time: " + this.postTime);
@@ -87,6 +96,7 @@ public class ForumPost {
                 .append("postUrl", this.postUrl)
                 .append("postUser", this.userName)
                 .append("hasQuote", this.hasQuote)
-                .append("postContent", this.postContent);
+                .append("postContent", this.postContent)
+                .append("postUpdated", this.isUpdated);
     }
 }

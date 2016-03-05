@@ -85,7 +85,6 @@ public class CrawlerThread extends Thread {
         // The objects that we're dealing with here a strings for urls
 
         if (level == 0) {
-            System.out.println("GETTING THREADS FROM BOARD");
             try {
                 String boardLink = crawlTask.getUrl();
                 MongoCollection collection = crawlTask.getCollection();
@@ -109,7 +108,6 @@ public class CrawlerThread extends Thread {
                 // process of this object has failed, but we just ignore it here
             }
         } else if (level == 1) {
-            System.out.println("GETTING POSTS FROM FORUMTHREAD");
             try {
                 String threadLink = crawlTask.getUrl();
                 MongoCollection collection = crawlTask.getCollection();
@@ -143,6 +141,7 @@ public class CrawlerThread extends Thread {
         }
 
         for (int page = 1; page <= pagesPerBoard; page++) {
+            System.out.println("GET THREAD FROM PAGE " + page + " OF BOARD: " + boardUrl);
             String pageUrl = boardUrl + forum.getBoardPageUrlPrefix() + page + forum.getBoardPageUrlSuffix();
             htmlStr = HtmlHelper.getHtmlString(pageUrl);
             if (!htmlStr.isEmpty()) {
@@ -151,7 +150,7 @@ public class CrawlerThread extends Thread {
                 for (Element threadItem : threadList) {
 
                     ForumThread thread = new ForumThread();
-                    //thread.setBoardUrl(htmlStr);
+                    thread.setBoardUrl(boardUrl);
                     Element threadTitle = threadItem.select(forum.getThreadTitle()).first();
 
                     thread.setThreadUrl(threadTitle.absUrl("href"));
@@ -202,55 +201,64 @@ public class CrawlerThread extends Thread {
     }
 
     public static void processThread(ForumConfig forum, String threadUrl, MongoCollection collection) {
-        //System.out.println("Processing thread: " + threadUrl);
-        String htmlStr = HtmlHelper.getHtmlString(threadUrl);
-
         /*
         * need to iterate through each pages of one thread
         * can use the navigation button to link to next page
         * end when there is no "Last" button
         * */
 
-        /*for each page of a thread*/
+        String htmlStr = HtmlHelper.getHtmlString(threadUrl);
+        org.jsoup.nodes.Document document;
+        int pagesPerThread = 1;
+        //System.out.println("PROCESS BOARD...");
         if (!htmlStr.isEmpty()) {
-            ForumPost post = new ForumPost();
-            org.jsoup.nodes.Document document = Jsoup.parse(htmlStr);
-            Elements postList = document.select(forum.getPostSelector());
-
-            int count = 0;
-            for (Element postElement : postList
-                    ) {
-                count++;
-                String id = postElement.id();
-                String url = threadUrl + "#" + id;
-                String time;
-                if (forum.isUsingTimeAttribute()) {
-                    time = postElement.select(forum.getPostTime()).first().attr(forum.getTimeAttributeName());
-                } else {
-                    time = postElement.select(forum.getPostTime()).first().text();
-                }
-                String user = postElement.select(forum.getPostUser()).first().text();
-                //Element postBody = postElement.select()....
-                String content = postElement.select(forum.getPostContent()).first().text();
-                boolean hasQuote = postElement.select(forum.getPostQuote()).size() > 0;
-
-                post.setPostId(id);
-                post.setPostUrl(url);
-                post.setUserName(user);
-                post.setPostContent(content);
-                post.setPostTime(time);
-                post.setHasQuote(hasQuote);
-                //post.printPost();
-//                System.out.println("POST " + count + ": " + post.getPostId()
-//                        + ": " + post.getPostTime()
-//                        + " -- " + post.getUserName()
-//                        + " -- " + post.getPostUrl());
-
-                addPostToDB(post, collection);
+            document = Jsoup.parse(htmlStr);
+            Element lastButton = document.select(forum.getLastButton()).first();
+            if (lastButton != null) {
+                String lastPageLink = lastButton.absUrl("href");
+                pagesPerThread = StringUtil.extractIndex(lastPageLink, forum.getThreadPageUrlPrefix(), forum.getThreadPageUrlSuffix());
             }
+        }
+
+        /*for each page of a thread*/
+        for (int page = 1; page <= pagesPerThread; page++) {
+            System.out.println("GET POST FROM PAGE " + page + " OF THREAD: " + threadUrl);
+            String pageUrl = threadUrl + forum.getBoardPageUrlPrefix() + page + forum.getBoardPageUrlSuffix();
+            htmlStr = HtmlHelper.getHtmlString(pageUrl);
+
+            if (!htmlStr.isEmpty()) {
+                document = Jsoup.parse(htmlStr);
+                Elements postList = document.select(forum.getPostSelector());
+
+                for (Element postElement : postList
+                        ) {
+                    ForumPost post = new ForumPost();
+                    post.setThreadUrl(threadUrl);
+                    String id = postElement.id();
+                    String url = threadUrl + "#" + id;
+                    String time;
+                    if (forum.isUsingTimeAttribute()) {
+                        time = postElement.select(forum.getPostTime()).first().attr(forum.getTimeAttributeName());
+                    } else {
+                        time = postElement.select(forum.getPostTime()).first().text();
+                    }
+                    String user = postElement.select(forum.getPostUser()).first().text();
+                    //Element postBody = postElement.select()....
+                    String content = postElement.select(forum.getPostContent()).first().text();
+                    boolean hasQuote = postElement.select(forum.getPostQuote()).size() > 0;
+
+                    post.setPostId(id);
+                    post.setPostUrl(url);
+                    post.setUserName(user);
+                    post.setPostContent(content);
+                    post.setPostTime(time);
+                    post.setHasQuote(hasQuote);
+
+                    addPostToDB(post, collection);
+                }
 
 
-            Element nextButton = document.select(forum.getNextButton()).first();
+            /*Element nextButton = document.select(forum.getNextButton()).first();
             //System.out.println(nextButton);
             if (nextButton != null) {
                 String nextPageUrl = nextButton.select("a").first().absUrl("href");
@@ -258,9 +266,8 @@ public class CrawlerThread extends Thread {
                 processThread(forum, nextPageUrl, collection);
             } else {
                 //System.out.println("This is the last page!");
+            }*/
             }
-
-
         }
     }
 
