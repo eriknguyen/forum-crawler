@@ -18,8 +18,10 @@ public class ForumConfig {
     private String dateFormat;
     private boolean hasNext;
     private String lastButton;
-    private String pageUrlPrefix;
-    private String pageUrlSuffix;
+    private String threadPageUrlPrefix;
+    private String threadPageUrlSuffix;
+    private String boardPageUrlPrefix;
+    private String boardPageUrlSuffix;
 
     private String threadSelector;
     private String threadTitle;
@@ -49,8 +51,10 @@ public class ForumConfig {
         this.dateFormat = configDoc.getString("dateFormat");
         this.hasNext = configDoc.getBoolean("hasNext");
         this.lastButton = configDoc.getString("lastButtonSelector");
-        this.pageUrlPrefix = configDoc.getString("pageUrlPrefix");
-        this.pageUrlSuffix = configDoc.getString("pageUrlSuffix");
+        this.threadPageUrlPrefix = configDoc.getString("threadPageUrlPrefix");
+        this.threadPageUrlSuffix = configDoc.getString("threadPageUrlSuffix");
+        this.boardPageUrlPrefix = configDoc.getString("boardPageUrlPrefix");
+        this.boardPageUrlSuffix = configDoc.getString("boardPageUrlSuffix");
 
         Document threadSelectorGroup = ((Document) configDoc.get("thread"));
         this.threadSelector = threadSelectorGroup.getString("threadSelector");
@@ -272,20 +276,36 @@ public class ForumConfig {
         this.lastButton = lastButton;
     }
 
-    public String getPageUrlPrefix() {
-        return pageUrlPrefix;
+    public String getThreadPageUrlPrefix() {
+        return threadPageUrlPrefix;
     }
 
-    public void setPageUrlPrefix(String pageUrlPrefix) {
-        this.pageUrlPrefix = pageUrlPrefix;
+    public void setThreadPageUrlPrefix(String threadPageUrlPrefix) {
+        this.threadPageUrlPrefix = threadPageUrlPrefix;
     }
 
-    public String getPageUrlSuffix() {
-        return pageUrlSuffix;
+    public String getThreadPageUrlSuffix() {
+        return threadPageUrlSuffix;
     }
 
-    public void setPageUrlSuffix(String pageUrlSuffix) {
-        this.pageUrlSuffix = pageUrlSuffix;
+    public void setThreadPageUrlSuffix(String threadPageUrlSuffix) {
+        this.threadPageUrlSuffix = threadPageUrlSuffix;
+    }
+
+    public String getBoardPageUrlPrefix() {
+        return boardPageUrlPrefix;
+    }
+
+    public void setBoardPageUrlPrefix(String boardPageUrlPrefix) {
+        this.boardPageUrlPrefix = boardPageUrlPrefix;
+    }
+
+    public String getBoardPageUrlSuffix() {
+        return boardPageUrlSuffix;
+    }
+
+    public void setBoardPageUrlSuffix(String boardPageUrlSuffix) {
+        this.boardPageUrlSuffix = boardPageUrlSuffix;
     }
 
     public void printForumConfig() {

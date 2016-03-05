@@ -147,7 +147,7 @@ public class CrawlerThread extends Thread{
 					thread.setLastPostTime(DateUtil.formatDate(lastPostTime));
 					thread.setSticky(threadItem.select(forum.getStickyClass()).size()>0);
 
-					/*Document checkThreadId = (Document) collection.find(new Document("_id", thread.getThreadUrl())).first();
+					Document checkThreadId = (Document) collection.find(new Document("_id", thread.getThreadUrl())).first();
 					if (checkThreadId != null) {
 						Date dateFromDB = DateUtil.parseSimpleDate(checkThreadId.getString("threadLastPostTime"));
 						boolean hasUpdate = dateFromDB.before(lastPostTime);
@@ -155,7 +155,7 @@ public class CrawlerThread extends Thread{
 							System.out.println("NO MORE UPDATE FROM THREAD: " + thread.getThreadName());
 							return;
 						}
-					}*/
+					}
 					thread.setThreadCreator(threadItem.select(forum.getThreadCreator()).first().text());
 					String replies = threadItem.select(forum.getThreadReplies()).first().text().replaceAll(",","");
 					String views = threadItem.select(forum.getThreadViews()).first().text().replaceAll(",","");
