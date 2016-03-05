@@ -12,11 +12,11 @@ public class StringUtil {
         return string.substring(0, lastIndex) + tail;
     }
 
-    public static String extractIndex(String source, String prefix, String suffix) {
-        int index = 1;
+    public static int extractIndex(String source, String prefix, String suffix) {
         int prefixIndex = source.lastIndexOf(prefix);
         String tail = source.substring(prefixIndex+prefix.length());
-        return tail.substring(0, tail.lastIndexOf(suffix));
+        String lastIndex = tail.substring(0, tail.lastIndexOf(suffix));
+        return Integer.parseInt(lastIndex);
     }
 
 }

@@ -58,8 +58,8 @@
 		"postQuote": "div.cPost_contentWrap>div.ipsType_normal"
 	},
 	"hasNext": true,
-	"nextButtonSelector": "ul.ipsPagination>li.ipsPagination_next:not(.ipsPagination_inactive)>a",
-	"lastButtonSelector": "ul.ipsPagination>li.ipsPagination_last>a",
+	"nextButtonSelector": "ul.ipsPagination:not(.ipsPagination_mini)>li.ipsPagination_next:not(.ipsPagination_inactive)>a",
+	"lastButtonSelector": "ul.ipsPagination:not(.ipsPagination_mini)>li.ipsPagination_last>a",
 	"threadPageUrlPrefix": "?page=",
 	"threadPageUrlSuffix": "",
 	"boardPageUrlPrefix": "?page=",
