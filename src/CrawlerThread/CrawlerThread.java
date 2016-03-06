@@ -210,6 +210,9 @@ public class CrawlerThread extends Thread {
 
         String htmlStr = HtmlHelper.getHtmlString(threadUrl);
         org.jsoup.nodes.Document document;
+        String boardUrl = getBoardUrlFromThread(threadUrl, collection);
+
+        /*get the number of pages in this thread*/
         int pagesPerThread = 1;
         //System.out.println("PROCESS BOARD...");
         if (!htmlStr.isEmpty()) {
@@ -235,12 +238,12 @@ public class CrawlerThread extends Thread {
                     Element postElement = postList.get(i);
                     String id = postElement.id();
 
-                    /*Document checkPostId = (Document) collection.find(new Document("_id", id)).first();
+                    Document checkPostId = (Document) collection.find(new Document("_id", id)).first();
                     if (checkPostId != null) {
                         System.out.println("NO MORE UPDATE FROM POST: " + id);
                         setThreadUpdated(threadUrl, collection);
                         return;
-                    }*/
+                    }
 
                     ForumPost post = new ForumPost();
                     String url = threadPageUrl + "#" + id;
@@ -258,12 +261,13 @@ public class CrawlerThread extends Thread {
                     post.setPostId(id);
                     post.setPostUrl(url);
                     post.setThreadUrl(threadUrl);
+                    post.setBoardUrl(boardUrl);
                     post.setUserName(user);
                     post.setPostContent(content);
                     post.setPostTime(time);
                     post.setHasQuote(hasQuote);
 
-                    addPostToDB(post, collection);
+                    post.addPostToDB(collection);
                 }
 
 
@@ -281,26 +285,16 @@ public class CrawlerThread extends Thread {
         setThreadUpdated(threadUrl, collection);
     }
 
+    private static String getBoardUrlFromThread(String threadUrl, MongoCollection collection) {
+        Document threadFromDB = (Document) collection.find(new Document("_id", threadUrl)).first();
+        return threadFromDB.getString("boardUrl");
+    }
+
     private static void setThreadUpdated(String threadUrl, MongoCollection collection) {
         collection.updateOne(
                 new Document("_id", threadUrl),
                 new Document("$set", new Document("isThreadUpdated", true))
         );
     }
-
-    private static void addPostToDB(ForumPost post, MongoCollection<org.bson.Document> collection) {
-        String postId = post.getPostId();
-        org.bson.Document doc = collection.find(new org.bson.Document("_id", postId)).first();
-        if (doc == null) {
-            collection.insertOne(post.extractPostBson());
-        } else {
-            collection.replaceOne(
-                    new org.bson.Document("_id", postId),
-                    post.extractPostBson()
-            );
-        }
-    }
-
-
 
 }

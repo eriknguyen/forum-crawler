@@ -1,5 +1,6 @@
 package Entities;
 
+import com.mongodb.client.MongoCollection;
 import org.bson.Document;
 
 /**
@@ -7,6 +8,7 @@ import org.bson.Document;
  */
 public class ForumPost {
     private String threadUrl;
+    private String boardUrl;
     private String postId;
     private String postUrl;
     private String userName;
@@ -81,6 +83,14 @@ public class ForumPost {
         isUpdated = updated;
     }
 
+    public String getBoardUrl() {
+        return boardUrl;
+    }
+
+    public void setBoardUrl(String boardUrl) {
+        this.boardUrl = boardUrl;
+    }
+
     public void printPost() {
         System.out.println("POST " + this.postId + ": ");
         System.out.println("Posted time: " + this.postTime);
@@ -92,11 +102,25 @@ public class ForumPost {
     public Document extractPostBson() {
         return new Document("_id", this.postId)
                 .append("threadUrl", this.threadUrl)
+                .append("boardUrl", this.boardUrl)
                 .append("postTime", this.postTime)
                 .append("postUrl", this.postUrl)
                 .append("postUser", this.userName)
                 .append("hasQuote", this.hasQuote)
                 .append("postContent", this.postContent)
                 .append("postUpdated", this.isUpdated);
+    }
+
+    public void addPostToDB(MongoCollection<Document> collection) {
+        String postId = this.postId;
+        org.bson.Document doc = collection.find(new org.bson.Document("_id", postId)).first();
+        if (doc == null) {
+            collection.insertOne(this.extractPostBson());
+        } else {
+            collection.replaceOne(
+                    new org.bson.Document("_id", postId),
+                    this.extractPostBson()
+            );
+        }
     }
 }
