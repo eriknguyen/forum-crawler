@@ -118,7 +118,7 @@ public class MainCrawler {
 			TaskQueue queue = new TaskQueue();
 			queue.setFilenamePrefix(prefix);
 
-			for (int i = 0; i < 5; i++) {
+			for (int i = 3; i < 4; i++) {
 				String url = boardList.get(i);
 				CrawlTask task = new CrawlTask(url, collection, forumConfig);
 				queue.push(task, 0);

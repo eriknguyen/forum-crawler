@@ -142,8 +142,8 @@ public class CrawlerThread extends Thread {
 
         for (int page = 1; page <= pagesPerBoard; page++) {
             System.out.println("GET THREAD FROM PAGE " + page + " OF BOARD: " + boardUrl);
-            String pageUrl = boardUrl + forum.getBoardPageUrlPrefix() + page + forum.getBoardPageUrlSuffix();
-            htmlStr = HtmlHelper.getHtmlString(pageUrl);
+            String boardPageUrl = boardUrl + forum.getBoardPageUrlPrefix() + page + forum.getBoardPageUrlSuffix();
+            htmlStr = HtmlHelper.getHtmlString(boardPageUrl);
             if (!htmlStr.isEmpty()) {
                 document = Jsoup.parse(htmlStr);
                 Elements threadList = document.select(forum.getThreadSelector());
@@ -221,21 +221,26 @@ public class CrawlerThread extends Thread {
         }
 
         /*for each page of a thread*/
-        for (int page = 1; page <= pagesPerThread; page++) {
+        for (int page = pagesPerThread; page >=1; page--) {
             System.out.println("GET POST FROM PAGE " + page + " OF THREAD: " + threadUrl);
-            String pageUrl = threadUrl + forum.getBoardPageUrlPrefix() + page + forum.getBoardPageUrlSuffix();
-            htmlStr = HtmlHelper.getHtmlString(pageUrl);
+            String threadPageUrl = threadUrl + forum.getBoardPageUrlPrefix() + page + forum.getBoardPageUrlSuffix();
+            htmlStr = HtmlHelper.getHtmlString(threadPageUrl);
 
             if (!htmlStr.isEmpty()) {
                 document = Jsoup.parse(htmlStr);
                 Elements postList = document.select(forum.getPostSelector());
 
-                for (Element postElement : postList
-                        ) {
+                for (int i = postList.size()-1; i >=0; i--) {
+                    Element postElement = postList.get(i);
+                    String id = postElement.id();
+                    Document checkPostId = (Document) collection.find(new Document("_id", id)).first();
+                    if (checkPostId != null) {
+                        System.out.println("NO MORE UPDATE FROM POST: " + id);
+                        return;
+                    }
                     ForumPost post = new ForumPost();
                     post.setThreadUrl(threadUrl);
-                    String id = postElement.id();
-                    String url = threadUrl + "#" + id;
+                    String url = threadPageUrl + "#" + id;
                     String time;
                     if (forum.isUsingTimeAttribute()) {
                         time = postElement.select(forum.getPostTime()).first().attr(forum.getTimeAttributeName());
