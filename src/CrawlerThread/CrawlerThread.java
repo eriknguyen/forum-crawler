@@ -210,6 +210,7 @@ public class CrawlerThread extends Thread {
         String htmlStr = HtmlHelper.getHtmlString(threadUrl);
         org.jsoup.nodes.Document document;
         int pagesPerThread = 1;
+        boolean threadUpdated = false;
         //System.out.println("PROCESS BOARD...");
         if (!htmlStr.isEmpty()) {
             document = Jsoup.parse(htmlStr);
@@ -236,10 +237,10 @@ public class CrawlerThread extends Thread {
                     Document checkPostId = (Document) collection.find(new Document("_id", id)).first();
                     if (checkPostId != null) {
                         System.out.println("NO MORE UPDATE FROM POST: " + id);
+                        setThreadUpdated(threadUrl, collection);
                         return;
                     }
                     ForumPost post = new ForumPost();
-                    post.setThreadUrl(threadUrl);
                     String url = threadPageUrl + "#" + id;
                     String time;
                     if (forum.isUsingTimeAttribute()) {
@@ -254,6 +255,7 @@ public class CrawlerThread extends Thread {
 
                     post.setPostId(id);
                     post.setPostUrl(url);
+                    post.setThreadUrl(threadUrl);
                     post.setUserName(user);
                     post.setPostContent(content);
                     post.setPostTime(time);
@@ -274,6 +276,14 @@ public class CrawlerThread extends Thread {
             }*/
             }
         }
+        setThreadUpdated(threadUrl, collection);
+    }
+
+    private static void setThreadUpdated(String threadUrl, MongoCollection collection) {
+        collection.updateOne(
+                new Document("_id", threadUrl),
+                new Document("$set", new Document("isThreadUpdated", true))
+        );
     }
 
     private static void addPostToDB(ForumPost post, MongoCollection<org.bson.Document> collection) {
@@ -288,5 +298,7 @@ public class CrawlerThread extends Thread {
             );
         }
     }
+
+
 
 }
