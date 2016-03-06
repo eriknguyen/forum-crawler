@@ -166,7 +166,7 @@ public class CrawlerThread extends Thread {
                         thread.setLastPostTime(DateUtil.formatDate(lastPostTime));
                         thread.setSticky(threadItem.select(forum.getStickyClass()).size() > 0);
 
-                        Document checkThreadId = (Document) collection.find(new Document("_id", thread.getThreadUrl())).first();
+                        /*Document checkThreadId = (Document) collection.find(new Document("_id", thread.getThreadUrl())).first();
                         if (checkThreadId != null) {
                             Date dateFromDB = DateUtil.parseSimpleDate(checkThreadId.getString("threadLastPostTime"));
                             boolean hasUpdate = dateFromDB.before(lastPostTime);
@@ -174,7 +174,8 @@ public class CrawlerThread extends Thread {
                                 System.out.println("NO MORE UPDATE FROM THREAD: " + thread.getThreadName());
                                 return;
                             }
-                        }
+                        }*/
+
                         thread.setThreadCreator(threadItem.select(forum.getThreadCreator()).first().text());
                         String replies = threadItem.select(forum.getThreadReplies()).first().text().replaceAll(",", "");
                         String views = threadItem.select(forum.getThreadViews()).first().text().replaceAll(",", "");
@@ -210,7 +211,6 @@ public class CrawlerThread extends Thread {
         String htmlStr = HtmlHelper.getHtmlString(threadUrl);
         org.jsoup.nodes.Document document;
         int pagesPerThread = 1;
-        boolean threadUpdated = false;
         //System.out.println("PROCESS BOARD...");
         if (!htmlStr.isEmpty()) {
             document = Jsoup.parse(htmlStr);
@@ -234,12 +234,14 @@ public class CrawlerThread extends Thread {
                 for (int i = postList.size()-1; i >=0; i--) {
                     Element postElement = postList.get(i);
                     String id = postElement.id();
-                    Document checkPostId = (Document) collection.find(new Document("_id", id)).first();
+
+                    /*Document checkPostId = (Document) collection.find(new Document("_id", id)).first();
                     if (checkPostId != null) {
                         System.out.println("NO MORE UPDATE FROM POST: " + id);
                         setThreadUpdated(threadUrl, collection);
                         return;
-                    }
+                    }*/
+
                     ForumPost post = new ForumPost();
                     String url = threadPageUrl + "#" + id;
                     String time;
