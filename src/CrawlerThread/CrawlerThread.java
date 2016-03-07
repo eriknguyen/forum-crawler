@@ -238,12 +238,12 @@ public class CrawlerThread extends Thread {
                     Element postElement = postList.get(i);
                     String id = postElement.id();
 
-                    Document checkPostId = (Document) collection.find(new Document("_id", id)).first();
+                    /*Document checkPostId = (Document) collection.find(new Document("_id", id)).first();
                     if (checkPostId != null) {
                         System.out.println("NO MORE UPDATE FROM POST: " + id);
                         setThreadUpdated(threadUrl, collection);
                         return;
-                    }
+                    }*/
 
                     ForumPost post = new ForumPost();
                     String url = threadPageUrl + "#" + id;
