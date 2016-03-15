@@ -81,7 +81,7 @@ public class MainCrawler {
 
 		System.out.println(ZonedDateTime.now());
 		MongoClient mongoClient = new MongoClient("localhost", 27017);
-		MongoDatabase db = mongoClient.getDatabase("fyp");
+		MongoDatabase db = mongoClient.getDatabase("test");
 
 		/*Get the forum configuration from DB, forumConfig collection*/
 		Hashtable<String, ForumConfig> forumTable = new Hashtable<>();
@@ -121,7 +121,7 @@ public class MainCrawler {
 			TaskQueue queue = new TaskQueue();
 			queue.setFilenamePrefix(prefix);
 
-			for (int i = 0; i < 16; i++) {
+			for (int i = 0; i < 4; i++) {
 				String url = boardList.get(i);
 				CrawlTask task = new CrawlTask(url, collection, forumConfig);
 				queue.push(task, 0);
