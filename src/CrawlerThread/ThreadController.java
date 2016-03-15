@@ -14,6 +14,7 @@ public class ThreadController {
 	TaskQueue tasks;
 	MainCrawler receiver;
 	int threadId;
+	ConnectionManager connectionManager;
 
 	/**
 	 * maximum depth level allowed
@@ -48,6 +49,7 @@ public class ThreadController {
 	 * started.
 	 */
 	public ThreadController(Class _threadClass,
+							ConnectionManager connManager,
 							int _maxThreads,
 							int _maxLevel,
 							TaskQueue _tasks,
@@ -55,6 +57,7 @@ public class ThreadController {
 							MainCrawler _receiver)
 		throws InstantiationException, IllegalAccessException {
 		threadClass = _threadClass;
+		connectionManager = connManager;
 		maxThreads = _maxThreads;
 		maxLevel = _maxLevel;
 		tasks = _tasks;
@@ -163,6 +166,7 @@ public class ThreadController {
 			CrawlerThread thread =
 				(CrawlerThread) threadClass.newInstance();
 			thread.setThreadController(this);
+			thread.setConnectionManager(this.connectionManager);
 			thread.setMessageReceiver(receiver);
 			thread.setLevel(currentLevel);
 			thread.setQueue(tasks);

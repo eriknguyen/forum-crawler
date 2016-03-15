@@ -9,7 +9,7 @@ import java.util.Date;
  */
 public class DateUtil {
 
-    public static Date parseDate(String dateStr, String format) throws ParseException {
+    public static Date parseStringToDate(String dateStr, String format) throws ParseException {
         Date date = null;
 
         SimpleDateFormat formatter = new SimpleDateFormat(format);
@@ -24,8 +24,13 @@ public class DateUtil {
         return date;
     }
 
-    public static String formatDate(Date lastPostTime) {
+    public static String parseDateToString(Date lastPostTime) {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
         return formatter.format(lastPostTime);
+    }
+
+    public static String formateDateString(String dateStr, String format) throws ParseException {
+        Date date = DateUtil.parseStringToDate(dateStr, format);
+        return DateUtil.parseDateToString(date);
     }
 }

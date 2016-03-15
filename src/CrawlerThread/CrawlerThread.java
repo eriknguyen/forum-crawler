@@ -5,24 +5,15 @@ import Entities.ForumConfig;
 import Entities.ForumPost;
 import Entities.ForumThread;
 import Util.DateUtil;
-import Util.HtmlHelper;
 import Util.StringUtil;
-import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.HttpClients;
 import org.bson.Document;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.*;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -34,6 +25,11 @@ public class CrawlerThread extends Thread {
     protected TaskQueue queue;
     protected ThreadController tc;
     protected MainCrawler mr;
+    protected ConnectionManager connectionManager;
+
+    public void setConnectionManager(ConnectionManager cm) {
+        this.connectionManager = cm;
+    }
 
     public void setId(int _id) {
         id = _id;
@@ -126,8 +122,8 @@ public class CrawlerThread extends Thread {
     }
 
 
-    public void processBoard(ForumConfig forum, String boardUrl, List<ForumThread> list, MongoCollection collection) {
-        String htmlStr = HtmlHelper.getHtmlString(boardUrl);
+    public void processBoard(ForumConfig forum, String boardUrl, List<ForumThread> list, MongoCollection collection) throws IOException {
+        String htmlStr = connectionManager.getHtmlString(boardUrl);
         org.jsoup.nodes.Document document;
         int pagesPerBoard = 1;
         //System.out.println("PROCESS BOARD...");
@@ -143,7 +139,7 @@ public class CrawlerThread extends Thread {
         for (int page = 1; page <= pagesPerBoard; page++) {
             System.out.println("GET THREAD FROM PAGE " + page + " OF BOARD: " + boardUrl);
             String boardPageUrl = boardUrl + forum.getBoardPageUrlPrefix() + page + forum.getBoardPageUrlSuffix();
-            htmlStr = HtmlHelper.getHtmlString(boardPageUrl);
+            htmlStr = connectionManager.getHtmlString(boardPageUrl);
             if (!htmlStr.isEmpty()) {
                 document = Jsoup.parse(htmlStr);
                 Elements threadList = document.select(forum.getThreadSelector());
@@ -162,19 +158,20 @@ public class CrawlerThread extends Thread {
                         } else {
                             lastPostTimeStr = threadItem.select(forum.getThreadLastPostTime()).first().text().replaceAll("\\s", "");
                         }
-                        Date lastPostTime = DateUtil.parseDate(lastPostTimeStr, forum.getDateFormat());
-                        thread.setLastPostTime(DateUtil.formatDate(lastPostTime));
+                        Date lastPostTime = DateUtil.parseStringToDate(lastPostTimeStr, forum.getDateFormat());
+                        thread.setLastPostTime(DateUtil.parseDateToString(lastPostTime));
                         thread.setSticky(threadItem.select(forum.getStickyClass()).size() > 0);
 
-                        /*Document checkThreadId = (Document) collection.find(new Document("_id", thread.getThreadUrl())).first();
+                        Document checkThreadId = (Document) collection.find(new Document("_id", thread.getThreadUrl())).first();
                         if (checkThreadId != null) {
                             Date dateFromDB = DateUtil.parseSimpleDate(checkThreadId.getString("threadLastPostTime"));
+                            boolean isThreadUpdated = checkThreadId.getBoolean("isThreadUpdated");
                             boolean hasUpdate = dateFromDB.before(lastPostTime);
-                            if ((!thread.isSticky()) && (!hasUpdate)) {
+                            if ((!thread.isSticky()) && (!hasUpdate) && isThreadUpdated) {
                                 System.out.println("NO MORE UPDATE FROM THREAD: " + thread.getThreadName());
                                 return;
                             }
-                        }*/
+                        }
 
                         thread.setThreadCreator(threadItem.select(forum.getThreadCreator()).first().text());
                         String replies = threadItem.select(forum.getThreadReplies()).first().text().replaceAll(",", "");
@@ -201,14 +198,14 @@ public class CrawlerThread extends Thread {
         }
     }
 
-    public static void processThread(ForumConfig forum, String threadUrl, MongoCollection collection) {
+    public void processThread(ForumConfig forum, String threadUrl, MongoCollection collection) throws IOException, ParseException {
         /*
         * need to iterate through each pages of one thread
         * can use the navigation button to link to next page
         * end when there is no "Last" button
         * */
 
-        String htmlStr = HtmlHelper.getHtmlString(threadUrl);
+        String htmlStr = connectionManager.getHtmlString(threadUrl);
         org.jsoup.nodes.Document document;
         String boardUrl = getBoardUrlFromThread(threadUrl, collection);
 
@@ -228,7 +225,7 @@ public class CrawlerThread extends Thread {
         for (int page = pagesPerThread; page >=1; page--) {
             System.out.println("GET POST FROM PAGE " + page + " OF THREAD: " + threadUrl);
             String threadPageUrl = threadUrl + forum.getBoardPageUrlPrefix() + page + forum.getBoardPageUrlSuffix();
-            htmlStr = HtmlHelper.getHtmlString(threadPageUrl);
+            htmlStr = connectionManager.getHtmlString(threadPageUrl);
 
             if (!htmlStr.isEmpty()) {
                 document = Jsoup.parse(htmlStr);
@@ -238,21 +235,22 @@ public class CrawlerThread extends Thread {
                     Element postElement = postList.get(i);
                     String id = postElement.id();
 
-                    /*Document checkPostId = (Document) collection.find(new Document("_id", id)).first();
+                    Document checkPostId = (Document) collection.find(new Document("_id", id)).first();
                     if (checkPostId != null) {
                         System.out.println("NO MORE UPDATE FROM POST: " + id);
                         setThreadUpdated(threadUrl, collection);
                         return;
-                    }*/
+                    }
 
                     ForumPost post = new ForumPost();
                     String url = threadPageUrl + "#" + id;
-                    String time;
+                    String timeStr;
                     if (forum.isUsingTimeAttribute()) {
-                        time = postElement.select(forum.getPostTime()).first().attr(forum.getTimeAttributeName());
+                        timeStr = postElement.select(forum.getPostTime()).first().attr(forum.getTimeAttributeName());
                     } else {
-                        time = postElement.select(forum.getPostTime()).first().text();
+                        timeStr = postElement.select(forum.getPostTime()).first().text();
                     }
+                    timeStr = DateUtil.formateDateString(timeStr, forum.getDateFormat());
                     String user = postElement.select(forum.getPostUser()).first().text();
                     //Element postBody = postElement.select()....
                     String content = postElement.select(forum.getPostContent()).first().text();
@@ -264,7 +262,7 @@ public class CrawlerThread extends Thread {
                     post.setBoardUrl(boardUrl);
                     post.setUserName(user);
                     post.setPostContent(content);
-                    post.setPostTime(time);
+                    post.setPostTime(timeStr);
                     post.setHasQuote(hasQuote);
 
                     post.addPostToDB(collection);

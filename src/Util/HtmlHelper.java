@@ -33,14 +33,14 @@ public class HtmlHelper {
     * */
     public static String getHtmlString(String rootUrl) {
 
-        HttpRequestRetryHandler retryHandler = new HttpRequestRetryHandler() {
+        /*HttpRequestRetryHandler retryHandler = new HttpRequestRetryHandler() {
             @Override
             public boolean retryRequest(IOException e, int i, HttpContext httpContext) {
                 if (i >= 5) {
                     // Do not retry if over max retry count
                     return false;
                 }
-                if (e instanceof InterruptedIOException) {
+                *//*if (e instanceof InterruptedIOException) {
                     // timeout
                     return false;
                 }
@@ -55,7 +55,7 @@ public class HtmlHelper {
                 if (e instanceof SSLException) {
                     // SSL handshake exception
                     return false;
-                }
+                }*//*
                 HttpClientContext clientContext = HttpClientContext.adapt(httpContext);
                 HttpRequest request = clientContext.getRequest();
                 boolean idempotent = !(request instanceof HttpEntityEnclosingRequest);
@@ -65,9 +65,10 @@ public class HtmlHelper {
                 }
                 return false;
             }
-        };
+        };*/
 
-        CloseableHttpClient httpClient = HttpClients.custom().setRetryHandler(retryHandler).build();
+        //HttpClient httpClient = HttpClients.custom().setRetryHandler(retryHandler).build();
+        HttpClient httpClient = HttpClients.createDefault();
         HttpGet httpGet = new HttpGet();
 
         String htmlStr = "";

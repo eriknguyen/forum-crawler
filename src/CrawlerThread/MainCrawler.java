@@ -49,9 +49,10 @@ public class MainCrawler {
 	public static final String TOWKAYZONE = "http://www.towkayzone.com.sg";
 
 	/*Constructor for MainCrawler*/
-	public MainCrawler(TaskQueue q, int maxLevel, int maxThreads)
+	public MainCrawler(ConnectionManager connectionManager, TaskQueue q, int maxLevel, int maxThreads)
 		throws InstantiationException, IllegalAccessException {
 		ThreadController tc = new ThreadController(CrawlerThread.class,
+												   connectionManager,
 												   maxThreads,
 												   maxLevel,
 												   q,
@@ -74,11 +75,13 @@ public class MainCrawler {
 		System.out.println("[" + threadId + "] finished");
 	}
 
-	public static void main(String[] args) throws ParseException {
+	public static void main(String[] args) throws ParseException, IOException {
+
+		ConnectionManager connectionManager = new ConnectionManager();
 
 		System.out.println(ZonedDateTime.now());
 		MongoClient mongoClient = new MongoClient("localhost", 27017);
-		MongoDatabase db = mongoClient.getDatabase("test2");
+		MongoDatabase db = mongoClient.getDatabase("fyp");
 
 		/*Get the forum configuration from DB, forumConfig collection*/
 		Hashtable<String, ForumConfig> forumTable = new Hashtable<>();
@@ -102,7 +105,7 @@ public class MainCrawler {
         *
         * */
 		MongoCollection collection = db.getCollection(forumConfig.getCollectionName());
-		checkBoardUpdate(forumConfig, collection);
+		checkBoardUpdate(connectionManager, forumConfig, collection);
 
 		List<String> boardList = new ArrayList<>();
 		FindIterable<org.bson.Document> boardIterable = collection.find(new org.bson.Document("boardName", new org.bson.Document("$exists", true)));
@@ -118,13 +121,13 @@ public class MainCrawler {
 			TaskQueue queue = new TaskQueue();
 			queue.setFilenamePrefix(prefix);
 
-			for (int i = 0; i < 3; i++) {
+			for (int i = 0; i < 16; i++) {
 				String url = boardList.get(i);
 				CrawlTask task = new CrawlTask(url, collection, forumConfig);
 				queue.push(task, 0);
 			}
 
-			new MainCrawler(queue, maxLevel, maxThreads);
+			new MainCrawler(connectionManager, queue, maxLevel, maxThreads);
 			//return;
 
 		} catch (Exception e) {
@@ -139,12 +142,12 @@ public class MainCrawler {
     * method to check if there is any new board added to the forum. Rarely check just to ensure the information is enough
     *
     * */
-	private static void checkBoardUpdate(ForumConfig forum, MongoCollection<org.bson.Document> collection) {
+	public static void checkBoardUpdate(ConnectionManager connectionManager, ForumConfig forum, MongoCollection<org.bson.Document> collection) throws IOException {
 		org.jsoup.nodes.Document document;
 		String htmlStr = "";
 
         /*if the board links haven't been saved to DB, get from index and save those links to DB*/
-		htmlStr = HtmlHelper.getHtmlString(forum.getUrl());
+		htmlStr = connectionManager.getHtmlString(forum.getUrl());
 
 		if (!htmlStr.isEmpty()) {   //check if the htmlStr parsed is valid
 
