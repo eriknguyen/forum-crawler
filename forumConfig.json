@@ -1,4 +1,4 @@
-{
+[{
 	"_id": "hardwarezone",
 	"url": "http://forums.hardwarezone.com.sg",
 	"collectionName": "hardwarezone",
@@ -32,7 +32,7 @@
 	"timeAttributeName": "",
 	"postOldToNew": true,
 	"dateFormat": ""
-}
+},
 
 {
 	"_id": "renotalk",

@@ -24,7 +24,7 @@ public class CrawlerThread extends Thread {
     protected int id;
     protected TaskQueue queue;
     protected ThreadController tc;
-    protected MainCrawler mr;
+    protected MainCrawler mainCrawler;
     protected ConnectionManager connectionManager;
 
     public void setConnectionManager(ConnectionManager cm) {
@@ -48,7 +48,7 @@ public class CrawlerThread extends Thread {
     }
 
     public void setMessageReceiver(MainCrawler _mr) {
-        mr = _mr;
+        mainCrawler = _mr;
     }
 
     public CrawlerThread() {
@@ -60,7 +60,7 @@ public class CrawlerThread extends Thread {
         /*while (queue.getQueueSize(currentLevel)>0)*/ {
 //			Object newTask = queue.pop(currentLevel);
             // Tell the message receiver what we're doing now
-            mr.receiveMessage(newTask, id);
+            mainCrawler.receiveMessage(newTask, id);
             // Process the newTask
             process(newTask);
             // If there are less threads running than it could, try

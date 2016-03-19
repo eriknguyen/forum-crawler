@@ -32,7 +32,7 @@ public class ConnectionManager {
         // Increase max total connection to 100
         this.connectionManager.setMaxTotal(100);
         // Increase default max connection per route to 10
-        this.connectionManager.setDefaultMaxPerRoute(10);
+        this.connectionManager.setDefaultMaxPerRoute(32);
 
         this.keepAliveStrategy = new ConnectionKeepAliveStrategy() {
             @Override

@@ -113,16 +113,22 @@ public class MainCrawler {
 			boardList.add(doc.getString("_id"));
 		}
 
+		/*for (String board :
+				boardList) {
+			System.out.println(boardList.indexOf(board) + ": " + board);
+		}
+*/
 		String prefix = "testPrefix_";
 		int maxLevel = 1;
-		int maxThreads = 16;
+		int maxThreads = 32;
 
 		try {
 			TaskQueue queue = new TaskQueue();
 			queue.setFilenamePrefix(prefix);
 
-			for (int i = 0; i < 4; i++) {
+			for (int i = 0; i < boardList.size(); i++) {
 				String url = boardList.get(i);
+				System.out.println(i + ": " + url);
 				CrawlTask task = new CrawlTask(url, collection, forumConfig);
 				queue.push(task, 0);
 			}
