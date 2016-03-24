@@ -162,6 +162,7 @@ public class CrawlerThread extends Thread {
                         thread.setLastPostTime(DateUtil.parseDateToString(lastPostTime));
                         thread.setSticky(threadItem.select(forum.getStickyClass()).size() > 0);
 
+                        /*checking thread update using lastPostTime*/
                         Document checkThreadId = (Document) collection.find(new Document("_id", thread.getThreadUrl())).first();
                         if (checkThreadId != null) {
                             Date dateFromDB = DateUtil.parseSimpleDate(checkThreadId.getString("threadLastPostTime"));
@@ -172,7 +173,6 @@ public class CrawlerThread extends Thread {
                                 return;
                             }
                         }
-
                         thread.setThreadCreator(threadItem.select(forum.getThreadCreator()).first().text());
                         String replies = threadItem.select(forum.getThreadReplies()).first().text().replaceAll(",", "");
                         String views = threadItem.select(forum.getThreadViews()).first().text().replaceAll(",", "");
