@@ -81,7 +81,7 @@ public class MainCrawler {
 
 		System.out.println(ZonedDateTime.now());
 		MongoClient mongoClient = new MongoClient("localhost", 27017);
-		MongoDatabase db = mongoClient.getDatabase("test");
+		MongoDatabase db = mongoClient.getDatabase("fyp");
 
 		/*Get the forum configuration from DB, forumConfig collection*/
 		Hashtable<String, ForumConfig> forumTable = new Hashtable<>();
@@ -113,11 +113,11 @@ public class MainCrawler {
 			boardList.add(doc.getString("_id"));
 		}
 
-		/*for (String board :
+		for (String board :
 				boardList) {
 			System.out.println(boardList.indexOf(board) + ": " + board);
 		}
-*/
+
 		String prefix = "testPrefix_";
 		int maxLevel = 1;
 		int maxThreads = 32;
@@ -154,6 +154,7 @@ public class MainCrawler {
 
         /*if the board links haven't been saved to DB, get from index and save those links to DB*/
 		htmlStr = connectionManager.getHtmlString(forum.getUrl());
+		//htmlStr = connectionManager.getHtmlString("http://www.rentalk.com/foru/");
 
 		if (!htmlStr.isEmpty()) {   //check if the htmlStr parsed is valid
 

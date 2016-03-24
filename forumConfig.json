@@ -1,4 +1,4 @@
-[{
+{
 	"_id": "hardwarezone",
 	"url": "http://forums.hardwarezone.com.sg",
 	"collectionName": "hardwarezone",
@@ -32,7 +32,7 @@
 	"timeAttributeName": "",
 	"postOldToNew": true,
 	"dateFormat": ""
-},
+}
 
 {
 	"_id": "renotalk",
@@ -55,7 +55,7 @@
 		"postBody": "div.cPost_contentWrap",
 		"postContent": "div.cPost_contentWrap>div.ipsType_normal",
 		"postUser": ">aside.ipsComment_author>h3.cAuthorPane_author strong",
-		"postQuote": "div.cPost_contentWrap>div.ipsType_normal"
+		"postQuote": "div.cPost_contentWrap>div.ipsType_normal blockquote"
 	},
 	"hasNext": true,
 	"nextButtonSelector": "ul.ipsPagination:not(.ipsPagination_mini)>li.ipsPagination_next:not(.ipsPagination_inactive)>a",

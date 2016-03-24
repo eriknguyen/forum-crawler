@@ -234,6 +234,7 @@ public class CrawlerThread extends Thread {
                 for (int i = postList.size()-1; i >=0; i--) {
                     Element postElement = postList.get(i);
                     String id = postElement.id();
+                    //System.out.println(id.toUpperCase());
 
                     Document checkPostId = (Document) collection.find(new Document("_id", id)).first();
                     if (checkPostId != null) {
@@ -250,7 +251,7 @@ public class CrawlerThread extends Thread {
                     } else {
                         timeStr = postElement.select(forum.getPostTime()).first().text();
                     }
-                    timeStr = DateUtil.formateDateString(timeStr, forum.getDateFormat());
+                    timeStr = DateUtil.formatDateString(timeStr, forum.getDateFormat());
                     String user = postElement.select(forum.getPostUser()).first().text();
                     //Element postBody = postElement.select()....
                     String content = postElement.select(forum.getPostContent()).first().text();
