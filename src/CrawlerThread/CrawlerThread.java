@@ -7,6 +7,7 @@ import Entities.ForumThread;
 import Util.DateUtil;
 import Util.StringUtil;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
@@ -83,17 +84,18 @@ public class CrawlerThread extends Thread {
         if (level == 0) {
             try {
                 String boardLink = crawlTask.getUrl();
-                MongoCollection collection = crawlTask.getCollection();
+                MongoDatabase db = crawlTask.getDb();
+                MongoCollection threadsCollection = db.getCollection("threads");
                 ForumConfig forumConfig = crawlTask.getForumConfig();
 
                 List<ForumThread> threadList = new ArrayList<>();
-                processBoard(forumConfig, boardLink, threadList, collection);
+                processBoard(forumConfig, boardLink, threadList, threadsCollection);
 
                 for (ForumThread thread :
                         threadList) {
                     try {
                         String link = thread.getThreadUrl();
-                        CrawlTask newTask = new CrawlTask(link, crawlTask.getCollection(), forumConfig);
+                        CrawlTask newTask = new CrawlTask(link, db, forumConfig);
                         queue.push(newTask, level + 1);
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -106,11 +108,11 @@ public class CrawlerThread extends Thread {
         } else if (level == 1) {
             try {
                 String threadLink = crawlTask.getUrl();
-                MongoCollection collection = crawlTask.getCollection();
+                MongoDatabase db = crawlTask.getDb();
                 ForumConfig forumConfig = crawlTask.getForumConfig();
 
 				/*List<ForumPost> postList = new ArrayList<>();*/
-                processThread(forumConfig, threadLink, collection);
+                processThread(forumConfig, threadLink, db);
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -198,16 +200,16 @@ public class CrawlerThread extends Thread {
         }
     }
 
-    public void processThread(ForumConfig forum, String threadUrl, MongoCollection collection) throws IOException, ParseException {
+    public void processThread(ForumConfig forum, String threadUrl, MongoDatabase db) throws IOException, ParseException {
         /*
         * need to iterate through each pages of one thread
         * can use the navigation button to link to next page
         * end when there is no "Last" button
         * */
-
+        MongoCollection collection = db.getCollection("posts");
         String htmlStr = connectionManager.getHtmlString(threadUrl);
         org.jsoup.nodes.Document document;
-        String boardUrl = getBoardUrlFromThread(threadUrl, collection);
+        String boardUrl = getBoardUrlFromThread(threadUrl, db);
 
         /*get the number of pages in this thread*/
         int pagesPerThread = 1;
@@ -284,8 +286,8 @@ public class CrawlerThread extends Thread {
         setThreadUpdated(threadUrl, collection);
     }
 
-    private static String getBoardUrlFromThread(String threadUrl, MongoCollection collection) {
-        Document threadFromDB = (Document) collection.find(new Document("_id", threadUrl)).first();
+    private static String getBoardUrlFromThread(String threadUrl, MongoDatabase db) {
+        Document threadFromDB = db.getCollection("threads").find(new Document("_id", threadUrl)).first();
         return threadFromDB.getString("boardUrl");
     }
 

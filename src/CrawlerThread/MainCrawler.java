@@ -104,11 +104,11 @@ public class MainCrawler {
         * Check if there is any new board. No need to run very often
         *
         * */
-		MongoCollection collection = db.getCollection(forumConfig.getCollectionName());
-		checkBoardUpdate(connectionManager, forumConfig, collection);
+		MongoCollection boardsCollection = db.getCollection("boards");
+		checkBoardUpdate(connectionManager, forumConfig, boardsCollection);
 
 		List<String> boardList = new ArrayList<>();
-		FindIterable<org.bson.Document> boardIterable = collection.find(new org.bson.Document("boardName", new org.bson.Document("$exists", true)));
+		FindIterable<org.bson.Document> boardIterable = boardsCollection.find(new org.bson.Document("boardName", new org.bson.Document("$exists", true)));
 		for (org.bson.Document doc : boardIterable ) {
 			boardList.add(doc.getString("_id"));
 		}
@@ -129,7 +129,7 @@ public class MainCrawler {
 			for (int i = 0; i < boardList.size(); i++) {
 				String url = boardList.get(i);
 				System.out.println(i + ": " + url);
-				CrawlTask task = new CrawlTask(url, collection, forumConfig);
+				CrawlTask task = new CrawlTask(url, db, forumConfig);
 				queue.push(task, 0);
 			}
 

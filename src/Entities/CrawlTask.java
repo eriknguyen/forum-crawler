@@ -1,6 +1,7 @@
 package Entities;
 
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 
 /**
@@ -9,12 +10,12 @@ import org.bson.Document;
 public class CrawlTask {
 
     private String url;
-    private MongoCollection<Document> collection;
+    private MongoDatabase db;
     private ForumConfig forumConfig;
 
-    public CrawlTask(String url, MongoCollection<Document> collection, ForumConfig forumConfig) {
+    public CrawlTask(String url, MongoDatabase db, ForumConfig forumConfig) {
         this.url = url;
-        this.collection = collection;
+        this.db = db;
         this.forumConfig = forumConfig;
     }
 
@@ -26,12 +27,12 @@ public class CrawlTask {
         this.url = url;
     }
 
-    public MongoCollection<Document> getCollection() {
-        return collection;
+    public MongoDatabase getDb() {
+        return db;
     }
 
-    public void setCollection(MongoCollection<Document> collection) {
-        this.collection = collection;
+    public void setDb(MongoDatabase db) {
+        this.db = db;
     }
 
     public ForumConfig getForumConfig() {
