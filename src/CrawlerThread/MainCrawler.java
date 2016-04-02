@@ -35,7 +35,7 @@ public class MainCrawler {
 	/*Declare some const*/
 	public static final String ID_HARDWAREZONE = "hardwarezone";
 	public static final String SG_EXPATS = "http://forum.singaporeexpats.com";
-	public static final String VR_ZONE = "http://forums.vr-zone.com";
+	public static final String ID_VRZONE = "vrzone";
 	public static final String ID_CLUBSNAP = "clubsnap";
 	public static final String ID_RENOTALK = "renotalk";
 	public static final String KIASUPARENTS = "http://www.kiasuparents.com/kiasu/forum";
@@ -81,7 +81,7 @@ public class MainCrawler {
 
 		System.out.println(ZonedDateTime.now());
 		MongoClient mongoClient = new MongoClient("localhost", 27017);
-		MongoDatabase db = mongoClient.getDatabase("fyp");
+		MongoDatabase db = mongoClient.getDatabase("test");
 
 		/*Get the forum configuration from DB, forumConfig collection*/
 		Hashtable<String, ForumConfig> forumTable = new Hashtable<>();
@@ -98,14 +98,14 @@ public class MainCrawler {
 			}
 		}
 
-		ForumConfig forumConfig = forumTable.get(ID_RENOTALK);
+		ForumConfig forumConfig = forumTable.get(ID_VRZONE);
 
 		/*
         * Check if there is any new board. No need to run very often
         *
         * */
 		MongoCollection boardsCollection = db.getCollection("boards");
-		checkBoardUpdate(connectionManager, forumConfig, boardsCollection);
+		//checkBoardUpdate(connectionManager, forumConfig, boardsCollection);
 
 		List<String> boardList = new ArrayList<>();
 		FindIterable<org.bson.Document> boardIterable = boardsCollection.find(new org.bson.Document("boardName", new org.bson.Document("$exists", true)));
@@ -162,7 +162,7 @@ public class MainCrawler {
 			document = Jsoup.parse(htmlStr);
 			document.setBaseUri(forum.getUrl());
 
-            /*extract the needed links from Jsoup document*/
+			/*extract the needed links from Jsoup document*/
 			Elements groupLinks = document.select(forum.getBoardSelector());
 			for (Element link : groupLinks) {
 				String url = link.absUrl("href");

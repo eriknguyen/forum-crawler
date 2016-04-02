@@ -16,7 +16,7 @@ public class ForumConfig {
     private String timeAttributeName;
     private boolean postOldToNew;
     private String dateFormat;
-    private boolean hasNext;
+    private boolean hasLast;
     private String lastButton;
     private String threadPageUrlPrefix;
     private String threadPageUrlSuffix;
@@ -49,7 +49,7 @@ public class ForumConfig {
         this.timeAttributeName = configDoc.getString("timeAttributeName");
         this.postOldToNew = configDoc.getBoolean("postOldToNew");
         this.dateFormat = configDoc.getString("dateFormat");
-        this.hasNext = configDoc.getBoolean("hasNext");
+        this.hasLast = configDoc.getBoolean("hasLast");
         this.lastButton = configDoc.getString("lastButtonSelector");
         this.threadPageUrlPrefix = configDoc.getString("threadPageUrlPrefix");
         this.threadPageUrlSuffix = configDoc.getString("threadPageUrlSuffix");
@@ -260,12 +260,12 @@ public class ForumConfig {
         this.postOldToNew = postOldToNew;
     }
 
-    public boolean isHasNext() {
-        return hasNext;
+    public boolean isHasLast() {
+        return hasLast;
     }
 
-    public void setHasNext(boolean hasNext) {
-        this.hasNext = hasNext;
+    public void setHasLast(boolean hasLast) {
+        this.hasLast = hasLast;
     }
 
     public String getLastButton() {

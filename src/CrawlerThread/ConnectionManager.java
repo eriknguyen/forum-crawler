@@ -1,12 +1,12 @@
 package CrawlerThread;
 
-import org.apache.http.HeaderElement;
-import org.apache.http.HeaderElementIterator;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
+import org.apache.http.*;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpRequestRetryHandler;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.conn.ConnectionKeepAliveStrategy;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -16,7 +16,10 @@ import org.apache.http.protocol.HTTP;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 
+import javax.net.ssl.SSLException;
 import java.io.IOException;
+import java.io.InterruptedIOException;
+import java.net.UnknownHostException;
 
 /**
  * Created by Khanh Nguyen on 3/14/2016.
@@ -52,9 +55,35 @@ public class ConnectionManager {
             }
         };
 
+        HttpRequestRetryHandler myRetryHandler = new HttpRequestRetryHandler() {
+            public boolean retryRequest(
+                    IOException exception,
+                    int executionCount,
+                    HttpContext context) {
+                if (executionCount >= 5) {
+                    // Set maximum retry number to 5
+                    return false;
+                }
+                if (exception instanceof InterruptedIOException) { return false; }
+                if (exception instanceof UnknownHostException) { return false; }
+                if (exception instanceof ConnectTimeoutException) { return false; }
+                if (exception instanceof SSLException) { return false; }
+
+                HttpClientContext clientContext = HttpClientContext.adapt(context);
+                HttpRequest request = clientContext.getRequest();
+                boolean idempotent = !(request instanceof HttpEntityEnclosingRequest);
+                if (idempotent) {
+                    // Retry if the request is considered idempotent
+                    return true;
+                }
+                return false;
+            }
+        };
+
         this.client = HttpClients.custom()
                 .setConnectionManager(connectionManager)
                 .setKeepAliveStrategy(keepAliveStrategy)
+                .setRetryHandler(myRetryHandler)
                 //.setDefaultRequestConfig(RequestConfig.custom().setStaleConnectionCheckEnabled(true).build())
                 .build();
     }
@@ -123,5 +152,7 @@ public class ConnectionManager {
             }
         }
     }
+
+
 
 }

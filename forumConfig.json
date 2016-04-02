@@ -21,7 +21,7 @@
 		"postUser": "div[id~=^postmenu_[0-9]+$]",
 		"postQuote": "div[id~=^post_message_[0-9]+$]>div.quote"
 	},	
-	"hasNext": false,
+	"hasLast": false,
 	"nextButtonSelector": ".pagination li.prevnext a:contains(Next)",
 	"lastButtonSelector": "",
 	"pageUrlPrefix": "-",
@@ -33,6 +33,10 @@
 	"postOldToNew": true,
 	"dateFormat": ""
 }
+
+
+
+
 
 {
 	"_id": "renotalk",
@@ -57,7 +61,7 @@
 		"postUser": ">aside.ipsComment_author>h3.cAuthorPane_author strong",
 		"postQuote": "div.cPost_contentWrap>div.ipsType_normal blockquote"
 	},
-	"hasNext": true,
+	"hasLast": true,
 	"nextButtonSelector": "ul.ipsPagination:not(.ipsPagination_mini)>li.ipsPagination_next:not(.ipsPagination_inactive)>a",
 	"lastButtonSelector": "ul.ipsPagination:not(.ipsPagination_mini)>li.ipsPagination_last>a",
 	"threadPageUrlPrefix": "?page=",
@@ -69,6 +73,50 @@
 	"postOldToNew": true,
 	"dateFormat": "yyyy-MM-dd'T'HH:mm:ss'Z'"
 }
+
+
+
+
+
+{
+	"_id": "vrzone",
+	"url": "http://forums.vr-zone.com",
+	"collectionName": "vrzone",
+	"boardSelector": "#forums >li.forumbit_nopost li.forumbit_post >div.forumrow >div.foruminfo a:not([rel])",
+	"thread": {
+		"threadSelector": "#threads >li.threadbit, #stickies >li.threadbit",
+		"threadTitle": "div.threadinfo h3.threadtitle >a.title",
+		"lastPostTime": "dl.threadlastpost dd:last-child",
+		"lastPostUser": "dl.threadlastpost >dd a.username",
+		"stickyClass": ">div.sticky",
+		"threadCreator": "div.threadinfo div.threadmeta a.username",
+		"replies": "ul.threadstats >li:first-child >a",
+		"views": "ul.threadstats >li:nth-child(2)"
+	},
+	"post": {
+		"postSelector": "#posts >li.postcontainer",
+		"postTime": "div.posthead span.postdate span.date",
+		"postBody": "div.postdetails >div.postbody",
+		"postContent": "div.postdetails >div.postbody div.postrow",
+		"postUser": "div.postdetails >div.userinfo a.username",
+		"postQuote": "div.postdetails >div.postbody div.postrow div.quote_container"
+	},	
+	"hasLast": true,
+	"nextButtonSelector": "",
+	"lastButtonSelector": "form.pagination >span.first_last>a",
+	"threadPageUrlPrefix": "-",
+	"threadPageUrlSuffix": ".html",
+	"boardPageUrlPrefix": "index",
+	"boardPageUrlSuffix": ".html",
+	"useTimeAttribute": false,
+	"timeAttributeName": "",
+	"postOldToNew": true,
+	"dateFormat": ""
+}
+
+
+
+
 
 {
 	"_id": "clubsnap",
@@ -93,7 +141,7 @@
 		"postUser": "",
 		"postQuote": ""
 	},	
-	"hasNext": true,
+	"hasLast": true,
 	"nextButtonSelector": "",
 	"lastButtonSelector": "",
 	"pageUrlPrefix": "",
@@ -106,41 +154,9 @@
 	"dateFormat": ""
 }
 
-{
-	"_id": "sample_format",
-	"url": "",
-	"collectionName": "",
-	"boardSelector": "",
-	"thread": {
-		"threadSelector": "",
-		"threadTitle": "",
-		"lastPostTime": "",
-		"lastPostUser": "",
-		"stickyClass": "",
-		"threadCreator": "",
-		"replies": "",
-		"views": ""
-	},
-	"post": {
-		"postSelector": "",
-		"postTime": "",
-		"postBody": "",
-		"postContent": "",
-		"postUser": "",
-		"postQuote": ""
-	},	
-	"hasNext": true,
-	"nextButtonSelector": "",
-	"lastButtonSelector": "",
-	"pageUrlPrefix": "",
-	"pageUrlSuffix": "",
-	"boardPageUrlPrefix": "",
-	"boardPageUrlSuffix": "",
-	"useTimeAttribute": false,
-	"timeAttributeName": "",
-	"postOldToNew": true,
-	"dateFormat": ""
-}
+
+
+
 
 {
 	"_id": "kiasuparents",
@@ -165,7 +181,7 @@
 		"postUser": "",
 		"postQuote": ""
 	},	
-	"hasNext": true,
+	"hasLast": true,
 	"nextButtonSelector": "",
 	"lastButtonSelector": "",
 	"pageUrlPrefix": "",

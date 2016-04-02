@@ -1,5 +1,6 @@
 package Util;
 
+import Entities.ForumConfig;
 import com.mongodb.MongoClient;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
@@ -11,6 +12,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Random;
 
@@ -23,26 +25,58 @@ public class UpdateDB {
 
         System.out.println(ZonedDateTime.now());
         MongoClient mongoClient = new MongoClient("localhost", 27017);
-        MongoDatabase db = mongoClient.getDatabase("fyp");
+        MongoDatabase db = mongoClient.getDatabase("test");
 
-        MongoCollection sourceCollection = db.getCollection("postsTwo");
-        MongoCollection targetCollection = db.getCollection("newPosts");
+        MongoCollection sourceCollection = db.getCollection("posts");
+        MongoCollection targetCollection = db.getCollection("newposts");
         FindIterable<Document> postIterable = sourceCollection.find();
 
         List<InsertOneModel> insertList = new ArrayList<>();
 
+        Hashtable<String, String> boardMap = new Hashtable<>();
+
+        FindIterable<Document> boards = db.getCollection("boards").find();
+        for (org.bson.Document doc : boards) {
+            boardMap.put(doc.getString("_id"), doc.getString("boardName"));
+        }
+
+        Hashtable<String, String> threadMap = new Hashtable<>();
+
+        FindIterable<Document> threads = db.getCollection("threads").find();
+        for (org.bson.Document doc : threads) {
+            threadMap.put(doc.getString("_id"), doc.getString("threadName"));
+        }
+
         int count = 0;
-        //Document newPost;
 
         for (Document post :
                 postIterable) {
-            count++;
-            if (count % 10000 == 0) {
-                System.out.println("Checked: " + count);
-            }
-            post.replace("hasQuote", getRandomBoolean());
 
-            insertList.add(new InsertOneModel(post));
+            if (post.getString("_id").contains("elComment")) {
+                count++;
+                if (count % 10000 == 0) {
+                    System.out.println("Checked: " + count);
+                }
+                String boardUrl = post.getString("boardUrl");
+                /*String forum;
+                if (boardUrl.contains("renotalk")) {
+                    forum = "RenoTalk";
+                } else {
+                    forum = "VR-Zone";
+                }*/
+                post.append("boardName", boardMap.get(boardUrl)).append("forum", "RenoTalk");
+
+                /*String postContent = post.getString("postContent");
+                if (postContent.contains("<a rel=")) {
+                    postContent = postContent.substring(postContent.lastIndexOf("</a>")+4);
+                }
+                post.replace("postContent", postContent);*/
+
+                String threadUrl = post.getString("threadUrl");
+                post.append("threadName", threadMap.get(threadUrl));
+
+                insertList.add(new InsertOneModel(post));
+            }
 
         }
 

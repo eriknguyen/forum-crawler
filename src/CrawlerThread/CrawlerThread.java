@@ -129,16 +129,21 @@ public class CrawlerThread extends Thread {
         org.jsoup.nodes.Document document;
         int pagesPerBoard = 1;
         //System.out.println("PROCESS BOARD...");
+
         if (!htmlStr.isEmpty()) {
             document = Jsoup.parse(htmlStr);
             Element lastButton = document.select(forum.getLastButton()).first();
             if (lastButton != null) {
                 String lastPageLink = lastButton.absUrl("href");
                 pagesPerBoard = StringUtil.extractIndex(lastPageLink, forum.getBoardPageUrlPrefix(), forum.getBoardPageUrlSuffix());
+            } else if (forum.isHasLast()) {
+
             }
         }
 
-        for (int page = 1; page <= pagesPerBoard; page++) {
+        /*traverse throught each pages*/
+        /*for (int page = 1; page <= pagesPerBoard; page++) {*/
+        for (int page = 1; page <= 3; page++) {
             System.out.println("GET THREAD FROM PAGE " + page + " OF BOARD: " + boardUrl);
             String boardPageUrl = boardUrl + forum.getBoardPageUrlPrefix() + page + forum.getBoardPageUrlSuffix();
             htmlStr = connectionManager.getHtmlString(boardPageUrl);
@@ -160,12 +165,18 @@ public class CrawlerThread extends Thread {
                         } else {
                             lastPostTimeStr = threadItem.select(forum.getThreadLastPostTime()).first().text().replaceAll("\\s", "");
                         }
-                        Date lastPostTime = DateUtil.parseStringToDate(lastPostTimeStr, forum.getDateFormat());
+                        Date lastPostTime;
+                        try {
+                            lastPostTime = DateUtil.parseStringToDate(lastPostTimeStr, forum.getDateFormat());
+                        } catch (Exception e) {
+                            lastPostTime = DateUtil.generateRandomThreadLastPostTime();
+                        }
+
                         thread.setLastPostTime(DateUtil.parseDateToString(lastPostTime));
                         thread.setSticky(threadItem.select(forum.getStickyClass()).size() > 0);
 
                         /*checking thread update using lastPostTime*/
-                        Document checkThreadId = (Document) collection.find(new Document("_id", thread.getThreadUrl())).first();
+                        /*Document checkThreadId = (Document) collection.find(new Document("_id", thread.getThreadUrl())).first();
                         if (checkThreadId != null) {
                             Date dateFromDB = DateUtil.parseSimpleDate(checkThreadId.getString("threadLastPostTime"));
                             boolean isThreadUpdated = checkThreadId.getBoolean("isThreadUpdated");
@@ -174,12 +185,23 @@ public class CrawlerThread extends Thread {
                                 System.out.println("NO MORE UPDATE FROM THREAD: " + thread.getThreadName());
                                 return;
                             }
-                        }
+                        }*/
+
                         thread.setThreadCreator(threadItem.select(forum.getThreadCreator()).first().text());
-                        String replies = threadItem.select(forum.getThreadReplies()).first().text().replaceAll(",", "");
-                        String views = threadItem.select(forum.getThreadViews()).first().text().replaceAll(",", "");
-                        thread.setReplies(Integer.parseInt(replies));
-                        thread.setViews(Integer.parseInt(views));
+
+                        try {
+                            String views = threadItem.select(forum.getThreadViews()).first().text().replaceAll(",", "");
+                            thread.setViews(Integer.parseInt(views));
+                        } catch (Exception e) {
+                            thread.setViews(0);
+                        }
+                        try {
+                            String replies = threadItem.select(forum.getThreadReplies()).first().text().replaceAll(",", "");
+                            thread.setReplies(Integer.parseInt(replies));
+                        } catch (Exception e) {
+                            thread.setReplies(0);
+                        }
+
 
                         String lastPostUser = threadItem.select(forum.getThreadLastPostUser()).first().text();
                         thread.setLastPostUser(lastPostUser);
@@ -224,7 +246,8 @@ public class CrawlerThread extends Thread {
         }
 
         /*for each page of a thread*/
-        for (int page = pagesPerThread; page >=1; page--) {
+        /*for (int page = pagesPerThread; page >=1; page--) {*/
+        for (int page = 3; page >=1; page--) {
             System.out.println("GET POST FROM PAGE " + page + " OF THREAD: " + threadUrl);
             String threadPageUrl = threadUrl + forum.getBoardPageUrlPrefix() + page + forum.getBoardPageUrlSuffix();
             htmlStr = connectionManager.getHtmlString(threadPageUrl);
@@ -238,12 +261,12 @@ public class CrawlerThread extends Thread {
                     String id = postElement.id();
                     //System.out.println(id.toUpperCase());
 
-                    Document checkPostId = (Document) collection.find(new Document("_id", id)).first();
+                    /*Document checkPostId = (Document) collection.find(new Document("_id", id)).first();
                     if (checkPostId != null) {
                         System.out.println("NO MORE UPDATE FROM POST: " + id);
                         setThreadUpdated(threadUrl, collection);
                         return;
-                    }
+                    }*/
 
                     ForumPost post = new ForumPost();
                     String url = threadPageUrl + "#" + id;
@@ -253,7 +276,12 @@ public class CrawlerThread extends Thread {
                     } else {
                         timeStr = postElement.select(forum.getPostTime()).first().text();
                     }
-                    timeStr = DateUtil.formatDateString(timeStr, forum.getDateFormat());
+                    try {
+                        timeStr = DateUtil.formatDateString(timeStr, forum.getDateFormat());
+                    } catch (Exception e){
+                        timeStr = DateUtil.parseDateToString(DateUtil.generateRandomPostTime());
+                    }
+
                     String user = postElement.select(forum.getPostUser()).first().text();
                     //Element postBody = postElement.select()....
                     String content = postElement.select(forum.getPostContent()).first().text();

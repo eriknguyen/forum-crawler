@@ -1,15 +1,15 @@
 package Util;
 
-import CrawlerThread.ConnectionManager;
-import Entities.ForumConfig;
 import com.mongodb.MongoClient;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-import com.mongodb.client.model.*;
+import com.mongodb.client.model.DeleteOneModel;
+import com.mongodb.client.model.InsertOneModel;
 import org.bson.Document;
 
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.ZonedDateTime;
@@ -50,17 +50,35 @@ public class DateUtil {
         return solrDate;
     }
 
+    public static Date generateRandomThreadLastPostTime() {
+        long offset = Timestamp.valueOf("2016-01-01 00:00:00").getTime();
+        long end = Timestamp.valueOf("2016-03-25 00:00:00").getTime();
+        long diff = end - offset + 1;
+        Timestamp rand = new Timestamp(offset + (long)(Math.random() * diff));
+        Date date = new Date(rand.getTime());
+        return date;
+    }
+
+    public static Date generateRandomPostTime() {
+        long offset = Timestamp.valueOf("2015-01-01 00:00:00").getTime();
+        long end = Timestamp.valueOf("2016-03-25 00:00:00").getTime();
+        long diff = end - offset + 1;
+        Timestamp rand = new Timestamp(offset + (long)(Math.random() * diff));
+        Date date = new Date(rand.getTime());
+        return date;
+    }
+
     public static void main(String[] args) throws ParseException, IOException {
 
         System.out.println(ZonedDateTime.now());
         MongoClient mongoClient = new MongoClient("localhost", 27017);
-        MongoDatabase db = mongoClient.getDatabase("fyp");
+        MongoDatabase db = mongoClient.getDatabase("test");
 
-        MongoCollection samplePost = db.getCollection("renotalk");
-        MongoCollection collection = db.getCollection("formattedThread");
-        FindIterable<Document> postIterable = samplePost.find(new Document("threadName", new Document("$exists", true)));
+        MongoCollection sourceCollection = db.getCollection("posts");
+        MongoCollection targetCollection = db.getCollection("newposts");
+        FindIterable<Document> postIterable = sourceCollection.find();
 
-        //List<UpdateOneModel> updateList = new ArrayList<>();
+        List<DeleteOneModel> removeList = new ArrayList<>();
         List<InsertOneModel> insertList = new ArrayList<>();
         int count = 0;
         int formatted = 0;
@@ -81,9 +99,9 @@ public class DateUtil {
                 //System.err.println(e);
                 //formattedTime = postTime;
                 formatted++;
-                /*removeList.add(new DeleteOneModel(
+                removeList.add(new DeleteOneModel(
                         new Document("postTime", postTime)
-                ));*/
+                ));
                 //insertList.add(new InsertOneModel(post));
                 continue;
             }
@@ -101,7 +119,7 @@ public class DateUtil {
 
         System.out.println("Total list size: " + insertList.size());
         //samplePost.bulkWrite(removeList);
-        collection.bulkWrite(insertList);
+        targetCollection.bulkWrite(insertList);
         System.out.println(ZonedDateTime.now());
     }
 }
