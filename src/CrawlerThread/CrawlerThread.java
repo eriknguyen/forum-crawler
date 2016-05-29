@@ -90,7 +90,7 @@ public class CrawlerThread extends Thread {
 
                 List<ForumThread> threadList = new ArrayList<>();
                 processBoard(forumConfig, boardLink, threadList, threadsCollection);
-
+                System.out.println("***********************************************************TOTAL THREADS TO CRAWL IS: " + threadList.size());
                 for (ForumThread thread :
                         threadList) {
                     try {
@@ -142,8 +142,8 @@ public class CrawlerThread extends Thread {
         }
 
         /*traverse throught each pages*/
-        /*for (int page = 1; page <= pagesPerBoard; page++) {*/
-        for (int page = 1; page <= 3; page++) {
+        for (int page = 1; page <= pagesPerBoard; page++) {
+        /*for (int page = 1; page <= 3; page++) {*/
             System.out.println("GET THREAD FROM PAGE " + page + " OF BOARD: " + boardUrl);
             String boardPageUrl = boardUrl + forum.getBoardPageUrlPrefix() + page + forum.getBoardPageUrlSuffix();
             htmlStr = connectionManager.getHtmlString(boardPageUrl);
@@ -169,6 +169,7 @@ public class CrawlerThread extends Thread {
                         try {
                             lastPostTime = DateUtil.parseStringToDate(lastPostTimeStr, forum.getDateFormat());
                         } catch (Exception e) {
+                            e.printStackTrace();
                             lastPostTime = DateUtil.generateRandomThreadLastPostTime();
                         }
 
@@ -176,16 +177,16 @@ public class CrawlerThread extends Thread {
                         thread.setSticky(threadItem.select(forum.getStickyClass()).size() > 0);
 
                         /*checking thread update using lastPostTime*/
-                        /*Document checkThreadId = (Document) collection.find(new Document("_id", thread.getThreadUrl())).first();
+                        Document checkThreadId = (Document) collection.find(new Document("_id", thread.getThreadUrl())).first();
                         if (checkThreadId != null) {
                             Date dateFromDB = DateUtil.parseSimpleDate(checkThreadId.getString("threadLastPostTime"));
-                            boolean isThreadUpdated = checkThreadId.getBoolean("isThreadUpdated");
+                            //boolean isThreadUpdated = checkThreadId.getBoolean("isThreadUpdated");
                             boolean hasUpdate = dateFromDB.before(lastPostTime);
-                            if ((!thread.isSticky()) && (!hasUpdate) && isThreadUpdated) {
+                            if ((!thread.isSticky()) && (!hasUpdate)) {
                                 System.out.println("NO MORE UPDATE FROM THREAD: " + thread.getThreadName());
                                 return;
                             }
-                        }*/
+                        }
 
                         thread.setThreadCreator(threadItem.select(forum.getThreadCreator()).first().text());
 
@@ -246,8 +247,8 @@ public class CrawlerThread extends Thread {
         }
 
         /*for each page of a thread*/
-        /*for (int page = pagesPerThread; page >=1; page--) {*/
-        for (int page = 3; page >=1; page--) {
+        for (int page = pagesPerThread; page >=1; page--) {
+        /*for (int page = 3; page >=1; page--) {*/
             System.out.println("GET POST FROM PAGE " + page + " OF THREAD: " + threadUrl);
             String threadPageUrl = threadUrl + forum.getBoardPageUrlPrefix() + page + forum.getBoardPageUrlSuffix();
             htmlStr = connectionManager.getHtmlString(threadPageUrl);
@@ -261,12 +262,12 @@ public class CrawlerThread extends Thread {
                     String id = postElement.id();
                     //System.out.println(id.toUpperCase());
 
-                    /*Document checkPostId = (Document) collection.find(new Document("_id", id)).first();
+                    Document checkPostId = (Document) collection.find(new Document("_id", id)).first();
                     if (checkPostId != null) {
                         System.out.println("NO MORE UPDATE FROM POST: " + id);
                         setThreadUpdated(threadUrl, collection);
                         return;
-                    }*/
+                    }
 
                     ForumPost post = new ForumPost();
                     String url = threadPageUrl + "#" + id;
@@ -279,6 +280,7 @@ public class CrawlerThread extends Thread {
                     try {
                         timeStr = DateUtil.formatDateString(timeStr, forum.getDateFormat());
                     } catch (Exception e){
+                        e.printStackTrace();
                         timeStr = DateUtil.parseDateToString(DateUtil.generateRandomPostTime());
                     }
 

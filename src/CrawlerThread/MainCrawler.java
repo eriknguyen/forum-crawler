@@ -2,31 +2,19 @@ package CrawlerThread;
 
 import Entities.CrawlTask;
 import Entities.ForumConfig;
-import Util.HtmlHelper;
-import Util.StringUtil;
 import com.mongodb.MongoClient;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.HttpClients;
 import org.bson.Document;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URI;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -98,14 +86,14 @@ public class MainCrawler {
 			}
 		}
 
-		ForumConfig forumConfig = forumTable.get(ID_VRZONE);
+		ForumConfig forumConfig = forumTable.get(ID_RENOTALK);
 
 		/*
         * Check if there is any new board. No need to run very often
         *
         * */
 		MongoCollection boardsCollection = db.getCollection("boards");
-		//checkBoardUpdate(connectionManager, forumConfig, boardsCollection);
+		checkBoardUpdate(connectionManager, forumConfig, boardsCollection);
 
 		List<String> boardList = new ArrayList<>();
 		FindIterable<org.bson.Document> boardIterable = boardsCollection.find(new org.bson.Document("boardName", new org.bson.Document("$exists", true)));
@@ -134,7 +122,7 @@ public class MainCrawler {
 			}
 
 			new MainCrawler(connectionManager, queue, maxLevel, maxThreads);
-			//return;
+			return;
 
 		} catch (Exception e) {
 			System.err.println("An error occured: ");
@@ -178,9 +166,5 @@ public class MainCrawler {
 			System.out.println("Invalid html string");
 		}
 	}
-
-
-
-
 
 }

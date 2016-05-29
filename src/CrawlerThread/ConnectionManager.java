@@ -83,7 +83,7 @@ public class ConnectionManager {
         this.client = HttpClients.custom()
                 .setConnectionManager(connectionManager)
                 .setKeepAliveStrategy(keepAliveStrategy)
-                .setRetryHandler(myRetryHandler)
+                //.setRetryHandler(myRetryHandler)
                 //.setDefaultRequestConfig(RequestConfig.custom().setStaleConnectionCheckEnabled(true).build())
                 .build();
     }
